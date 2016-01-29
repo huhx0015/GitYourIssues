@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import com.huhx0015.gityourissues.R;
 import com.huhx0015.gityourissues.constants.GitConstants;
 import com.huhx0015.gityourissues.interfaces.RetrofitInterface;
@@ -39,6 +40,10 @@ public class MainActivity extends AppCompatActivity {
     @Bind(R.id.git_main_activity_fab_button) FloatingActionButton gitFabButton;
     @Bind(R.id.git_main_activity_progress_indicator) ProgressBar gitProgressBar;
     @Bind(R.id.git_main_activity_recycler_view) RecyclerView gitRecyclerView;
+    @Bind(R.id.repo_name_text) TextView gitRepoName;
+    @Bind(R.id.repo_author_text) TextView gitRepoAuthor;
+    @Bind(R.id.repo_open_issues_text) TextView gitOpenIssuesLabelText;
+    @Bind(R.id.repo_open_issues_value_text) TextView gitOpenIssuesValueText;
     @Bind(R.id.git_main_activity_toolbar) Toolbar gitToolbar;
 
     /** ACTIVITY LIFECYCLE METHODS _____________________________________________________________ **/
