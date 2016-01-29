@@ -1,5 +1,6 @@
 package com.huhx0015.gityourissues.activities;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -13,7 +14,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import com.google.gson.Gson;
 import com.huhx0015.gityourissues.R;
+import com.huhx0015.gityourissues.constants.ActivityConstants;
 import com.huhx0015.gityourissues.constants.GitConstants;
 import com.huhx0015.gityourissues.interfaces.RetrofitInterface;
 import com.huhx0015.gityourissues.models.Issue;
@@ -151,11 +155,23 @@ public class MainActivity extends AppCompatActivity {
         RetrofitInterface apiRequest = retrofitAdapter.create(RetrofitInterface.class);
 
         try {
-            issuesListResult = apiRequest.getIssues(GitConstants.GIT_USER, GitConstants.GIT_REPO).execute().body();
+            apiRequest.getIssues(GitConstants.GIT_USER, GitConstants.GIT_REPO).execute().body();
+            //issuesListResult = apiRequest.getIssues(GitConstants.GIT_USER, GitConstants.GIT_REPO).execute().body();
         } catch (IOException e) {
             Log.e(LOG_TAG, "retrieveIssues(): Exception occurred while trying to retrieve issues: " + e);
             e.printStackTrace();
         }
+    }
+
+    /** INTENT METHODS _________________________________________________________________________ **/
+
+    private void launchIssueActivity(Issue issue) {
+
+        Gson gson = new Gson();
+
+        Intent i = new Intent(this, IssueActivity.class);
+        i.putExtra(ActivityConstants.GIT_ISSUE_CONTENT, gson.toJson(issue));
+        startActivity(i); // Launches the activity class.
     }
 
     /** SUBCLASSES _____________________________________________________________________________ **/
