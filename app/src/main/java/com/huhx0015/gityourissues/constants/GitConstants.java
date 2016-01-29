@@ -1,4 +1,4 @@
-package com.huhx0015.gityourissues;
+package com.huhx0015.gityourissues.constants;
 
 /**
  * Created by Michael Yoon Huh on 1/29/2016.

@@ -1,4 +1,4 @@
-package com.huhx0015.gityourissues;
+package com.huhx0015.gityourissues.interfaces;
 
 import retrofit.Call;
 import retrofit.http.GET;
@@ -10,5 +10,5 @@ public interface RetrofitInterface {
 
     // GET /repos/:owner/:repo/issues
 //    @GET("/repos/")
-//    Call<Issues> getOpenIssues();
+//    Call<Issue> getOpenIssues();
 }

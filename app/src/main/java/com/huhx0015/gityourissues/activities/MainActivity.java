@@ -1,4 +1,4 @@
-package com.huhx0015.gityourissues;
+package com.huhx0015.gityourissues.activities;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -8,6 +8,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.huhx0015.gityourissues.R;
 
 /**
  * Created by Michael Yoon Huh on 1/29/2016.
