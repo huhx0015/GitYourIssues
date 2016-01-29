@@ -17,13 +17,14 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:id="@+id/git_main_activity_cardview_container">
 
         <android.support.v7.widget.CardView
             xmlns:card_view="http://schemas.android.com/apk/res-auto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/recycler_view_cardview_container"
+            android:id="@+id/git_main_activity_cardview"
             android:foreground="?android:attr/selectableItemBackground"
             card_view:cardBackgroundColor="@color/colorHighlightedCard"
             card_view:cardCornerRadius="10dp"
@@ -37,7 +38,7 @@
                 android:layout_height="wrap_content"
                 android:padding="8dp"
                 android:gravity="center_vertical"
-                android:id="@+id/git_main_activity_cardview_container">
+                android:id="@+id/git_main_activity_cardview_subcontainer">
 
                 <LinearLayout
                     android:orientation="vertical"

@@ -1,8 +1,11 @@
 package com.huhx0015.gityourissues.interfaces;
 
 import com.huhx0015.gityourissues.models.Issue;
+
+import java.util.List;
 import retrofit.Call;
 import retrofit.http.GET;
+import retrofit.http.Path;
 
 /**
  * Created by Michael Yoon Huh on 1/29/2016.
@@ -10,6 +13,6 @@ import retrofit.http.GET;
 public interface RetrofitInterface {
 
     // GET /repos/:owner/:repo/issues
-    @GET("/repos/")
-    Call<Issue> getIssues();
+    @GET("/repos/{owner}/{repo}/issues")
+    Call<List<Issue>> getIssues(@Path("owner") String owner, @Path("repo") String repo);
 }

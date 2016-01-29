@@ -1,6 +1,9 @@
 
 package com.huhx0015.gityourissues.models;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 import javax.annotation.Generated;
 
 /**
@@ -10,10 +13,17 @@ import javax.annotation.Generated;
 @Generated("org.jsonschema2pojo")
 public class PullRequest {
 
-    private String url;
-    private String htmlUrl;
-    private String diffUrl;
-    private String patchUrl;
+    @SerializedName("url")
+    @Expose private String url;
+
+    @SerializedName("html_url")
+    @Expose private String htmlUrl;
+
+    @SerializedName("diff_url")
+    @Expose private String diffUrl;
+
+    @SerializedName("patch_url")
+    @Expose private String patchUrl;
 
     /**
      * 

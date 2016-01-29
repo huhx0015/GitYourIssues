@@ -3,7 +3,6 @@ package com.huhx0015.gityourissues.activities;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,6 +19,7 @@ import com.huhx0015.gityourissues.interfaces.RetrofitInterface;
 import com.huhx0015.gityourissues.models.Issue;
 import com.huhx0015.gityourissues.ui.RecyclerAdapter;
 import com.squareup.okhttp.OkHttpClient;
+import java.io.IOException;
 import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -107,8 +107,11 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                queryTask = new GitQueryTask();
+                queryTask.execute();
+
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
             }
         });
     }
@@ -140,19 +143,19 @@ public class MainActivity extends AppCompatActivity {
     private void retrieveIssues() {
 
         Retrofit retrofitAdapter = new Retrofit.Builder()
-                .baseUrl(GitConstants.BASE_URL + GitConstants.ISSUES_URL)
+                .baseUrl(GitConstants.BASE_URL)
                 .client(new OkHttpClient())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         RetrofitInterface apiRequest = retrofitAdapter.create(RetrofitInterface.class);
 
-//        try {
-//            issuesListResult = apiRequest.getIssues().execute().body().;
-//        } catch (IOException e) {
-//            Log.e(LOG_TAG, "retrieveIssues(): Exception occurred while trying to retrieve issues: " + e);
-//            e.printStackTrace();
-//        }
+        try {
+            issuesListResult = apiRequest.getIssues(GitConstants.GIT_USER, GitConstants.GIT_REPO).execute().body();
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "retrieveIssues(): Exception occurred while trying to retrieve issues: " + e);
+            e.printStackTrace();
+        }
     }
 
     /** SUBCLASSES _____________________________________________________________________________ **/

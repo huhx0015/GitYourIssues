@@ -1,6 +1,8 @@
 
 package com.huhx0015.gityourissues.models;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Generated;
@@ -12,26 +14,65 @@ import javax.annotation.Generated;
 @Generated("org.jsonschema2pojo")
 public class Issue {
 
-    private String url;
-    private String labelsUrl;
-    private String commentsUrl;
-    private String eventsUrl;
-    private String htmlUrl;
-    private int id;
-    private int number;
-    private String title;
-    private User user;
-    private List<Object> labels = new ArrayList<Object>();
-    private String state;
-    private boolean locked;
-    private Object assignee;
-    private Object milestone;
-    private int comments;
-    private String createdAt;
-    private String updatedAt;
-    private Object closedAt;
-    private PullRequest pullRequest;
-    private String body;
+    @SerializedName("url")
+    @Expose private String url;
+
+    @SerializedName("labels_url")
+    @Expose private String labelsUrl;
+
+    @SerializedName("comments_url")
+    @Expose private String commentsUrl;
+
+    @SerializedName("events_url")
+    @Expose private String eventsUrl;
+
+    @SerializedName("html_url")
+    @Expose private String htmlUrl;
+
+    @SerializedName("id")
+    @Expose private int id;
+
+    @SerializedName("number")
+    @Expose private int number;
+
+    @SerializedName("title")
+    @Expose private String title;
+
+    @SerializedName("user")
+    @Expose private User user;
+
+    @SerializedName("labels")
+    @Expose private List<Object> labels = new ArrayList<Object>();
+
+    @SerializedName("state")
+    @Expose private String state;
+
+    @SerializedName("locked")
+    @Expose private boolean locked;
+
+    @SerializedName("assignee")
+    @Expose private Object assignee;
+
+    @SerializedName("milestone")
+    @Expose private Object milestone;
+
+    @SerializedName("comments")
+    @Expose private int comments;
+
+    @SerializedName("created_at")
+    @Expose private String createdAt;
+
+    @SerializedName("updated_at")
+    @Expose private String updatedAt;
+
+    @SerializedName("closed_at")
+    @Expose private Object closedAt;
+
+    @SerializedName("pull_request")
+    @Expose private PullRequest pullRequest;
+
+    @SerializedName("body")
+    @Expose private String body;
 
     /**
      * 
