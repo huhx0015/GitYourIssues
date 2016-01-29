@@ -18,14 +18,19 @@ import java.util.List;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ListViewHolder> {
 
+    private static final String LOG_TAG = RecyclerAdapter.class.getSimpleName();
+
     private Context context;
     private List<Issue> issueList;
-    private static final String LOG_TAG = RecyclerAdapter.class.getSimpleName();
+
+    /** CONSTRUCTOR METHODS ____________________________________________________________________ **/
 
     public RecyclerAdapter(List<Issue> list, Context context){
         this.context = context;
         this.issueList = list;
     }
+
+    /** RECYCLER VIEW METHODS __________________________________________________________________ **/
 
     @Override
     public ListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -54,6 +59,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ListVi
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
     }
+
+    /** SUBCLASSES _____________________________________________________________________________ **/
 
     public static class ListViewHolder extends RecyclerView.ViewHolder {
 

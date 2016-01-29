@@ -1,17 +1,29 @@
 package com.huhx0015.gityourissues.activities;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ProgressBar;
 import com.huhx0015.gityourissues.R;
+import com.huhx0015.gityourissues.constants.GitConstants;
+import com.huhx0015.gityourissues.interfaces.RetrofitInterface;
+import com.huhx0015.gityourissues.models.Issue;
+import com.huhx0015.gityourissues.ui.RecyclerAdapter;
+import com.squareup.okhttp.OkHttpClient;
+import java.util.List;
 import butterknife.Bind;
+import butterknife.ButterKnife;
+import retrofit.GsonConverterFactory;
+import retrofit.Retrofit;
 
 /**
  * Created by Michael Yoon Huh on 1/29/2016.
@@ -21,9 +33,15 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
+    private GitQueryTask queryTask;
+    private List<Issue> issuesListResult;
+
     @Bind(R.id.git_main_activity_fab_button) FloatingActionButton gitFabButton;
     @Bind(R.id.git_main_activity_progress_indicator) ProgressBar gitProgressBar;
     @Bind(R.id.git_main_activity_recycler_view) RecyclerView gitRecyclerView;
+    @Bind(R.id.git_main_activity_toolbar) Toolbar gitToolbar;
+
+    /** ACTIVITY LIFECYCLE METHODS _____________________________________________________________ **/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +50,20 @@ public class MainActivity extends AppCompatActivity {
         initLayout();
         initButtons();
     }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        if (null != queryTask) {
+            if (queryTask.getStatus() == AsyncTask.Status.RUNNING) {
+                queryTask.cancel(true);
+                Log.d(LOG_TAG, "onStop(): AsyncTask has been cancelled.");
+            }
+        }
+    }
+
+    /** ACTIVITY OVERRIDDEN METHODS ____________________________________________________________ **/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -55,21 +87,112 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /** LAYOUT METHODS _________________________________________________________________________ **/
+
     private void initLayout() {
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        ButterKnife.bind(this);
+        setSupportActionBar(gitToolbar);
     }
 
     private void initButtons() {
 
         // FLOATING ACTION BUTTON:
         gitFabButton.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
+    }
+
+    private void updateView(boolean issuesReceived) {
+
+        gitProgressBar.setVisibility(View.GONE);
+
+        if (issuesReceived) {
+            initRecyclerView();
+            setRecyclerList(issuesListResult);
+        }
+    }
+
+    /** RECYCLERVIEW METHODS ___________________________________________________________________ **/
+
+    private void initRecyclerView() {
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        gitRecyclerView.setLayoutManager(layoutManager);
+    }
+
+    private void setRecyclerList(List<Issue> issueList){
+        RecyclerAdapter recyclerAdapter = new RecyclerAdapter(issueList, this);
+        gitRecyclerView.setAdapter(recyclerAdapter);
+    }
+
+    /** RETROFIT METHODS _______________________________________________________________________ **/
+
+    private void retrieveIssues() {
+
+        Retrofit retrofitAdapter = new Retrofit.Builder()
+                .baseUrl(GitConstants.BASE_URL + GitConstants.ISSUES_URL)
+                .client(new OkHttpClient())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        RetrofitInterface apiRequest = retrofitAdapter.create(RetrofitInterface.class);
+
+//        try {
+//            issuesListResult = apiRequest.getIssues().execute().body().;
+//        } catch (IOException e) {
+//            Log.e(LOG_TAG, "retrieveIssues(): Exception occurred while trying to retrieve issues: " + e);
+//            e.printStackTrace();
+//        }
+    }
+
+    /** SUBCLASSES _____________________________________________________________________________ **/
+
+    class GitQueryTask extends AsyncTask<Void, Void, Void> {
+
+        boolean isError = false;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            gitProgressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            try {
+                Log.d(LOG_TAG, "QueryTask(): Retrieving issues in " + GitConstants.GIT_REPO + " from GitHub...");
+                retrieveIssues();
+            } catch (Exception e) {
+                isError = true;
+                Log.e(LOG_TAG, "QueryTask(): An exception error occurred: " + e);
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            if (!isCancelled()) {
+
+                runOnUiThread(new Runnable() {
+
+                    public void run() {
+
+                        if (!isError) {
+                            updateView(true);
+                        }
+                    }
+                });
+            }
+        }
     }
 }

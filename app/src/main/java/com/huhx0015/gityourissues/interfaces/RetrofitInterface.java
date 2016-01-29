@@ -1,5 +1,6 @@
 package com.huhx0015.gityourissues.interfaces;
 
+import com.huhx0015.gityourissues.models.Issue;
 import retrofit.Call;
 import retrofit.http.GET;
 
@@ -9,6 +10,6 @@ import retrofit.http.GET;
 public interface RetrofitInterface {
 
     // GET /repos/:owner/:repo/issues
-//    @GET("/repos/")
-//    Call<Issue> getOpenIssues();
+    @GET("/repos/")
+    Call<Issue> getIssues();
 }
