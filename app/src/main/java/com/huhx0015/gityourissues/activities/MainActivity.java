@@ -24,6 +24,7 @@ import com.huhx0015.gityourissues.models.Issue;
 import com.huhx0015.gityourissues.ui.RecyclerAdapter;
 import com.squareup.okhttp.OkHttpClient;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -155,8 +156,8 @@ public class MainActivity extends AppCompatActivity {
         RetrofitInterface apiRequest = retrofitAdapter.create(RetrofitInterface.class);
 
         try {
-            apiRequest.getIssues(GitConstants.GIT_USER, GitConstants.GIT_REPO).execute().body();
-            //issuesListResult = apiRequest.getIssues(GitConstants.GIT_USER, GitConstants.GIT_REPO).execute().body();
+            issuesListResult = new ArrayList<>();
+            issuesListResult = apiRequest.getIssues(GitConstants.GIT_USER, GitConstants.GIT_REPO).execute().body();
         } catch (IOException e) {
             Log.e(LOG_TAG, "retrieveIssues(): Exception occurred while trying to retrieve issues: " + e);
             e.printStackTrace();
@@ -171,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
 
         Intent i = new Intent(this, IssueActivity.class);
         i.putExtra(ActivityConstants.GIT_ISSUE_CONTENT, gson.toJson(issue));
-        startActivity(i); // Launches the activity class.
+        startActivity(i);
     }
 
     /** SUBCLASSES _____________________________________________________________________________ **/
