@@ -1,7 +1,6 @@
 package com.huhx0015.gityourissues.interfaces;
 
 import com.huhx0015.gityourissues.models.Issue;
-
 import java.util.List;
 import retrofit.Call;
 import retrofit.http.GET;

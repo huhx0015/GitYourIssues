@@ -42,7 +42,7 @@
                 <TextView
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/issue_description_text"
+                    android:id="@+id/issue_body_text"
                     android:textSize="16sp"
                     android:typeface="sans" />
 
@@ -52,7 +52,8 @@
                     android:id="@+id/issue_date_text"
                     android:textSize="10sp"
                     android:typeface="sans"
-                    android:textStyle="italic" />
+                    android:textStyle="italic"
+                    android:layout_marginTop="4dp" />
             </LinearLayout>
         </LinearLayout>
 

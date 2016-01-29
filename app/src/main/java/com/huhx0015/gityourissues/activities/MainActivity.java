@@ -14,7 +14,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
 import com.google.gson.Gson;
 import com.huhx0015.gityourissues.R;
 import com.huhx0015.gityourissues.constants.ActivityConstants;

@@ -41,13 +41,18 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ListVi
     @Override
     public void onBindViewHolder(ListViewHolder holder, int position) {
 
-        holder.issueNameText.setText(issueList.get(position).getTitle());
-        holder.issueDescriptionText.setText(issueList.get(position).getBody());
-        holder.issueDateText.setText(issueList.get(position).getCreatedAt());
+        String issueTitle = issueList.get(position).getTitle();
+        String issueDate = issueList.get(position).getUpdatedAt();
+        String issueBody = issueList.get(position).getBody();
+        issueBody = issueBody.substring(0, 140);
 
-        Log.d(LOG_TAG, "onBindViewHolder(): Issue Name: " + issueList.get(position).getTitle());
-        Log.d(LOG_TAG, "onBindViewHolder(): Issue Description: " + issueList.get(position).getBody());
-        Log.d(LOG_TAG, "onBindViewHolder(): Time created at: " + issueList.get(position).getCreatedAt());
+        holder.issueTitleText.setText(issueTitle);
+        holder.issueBodyText.setText(issueBody);
+        holder.issueDateText.setText(issueDate);
+
+        Log.d(LOG_TAG, "onBindViewHolder(): Issue Name: " + issueTitle);
+        Log.d(LOG_TAG, "onBindViewHolder(): Issue Body: " + issueBody);
+        Log.d(LOG_TAG, "onBindViewHolder(): Issue Updated At: " + issueDate);
     }
 
     @Override
@@ -65,8 +70,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ListVi
     public static class ListViewHolder extends RecyclerView.ViewHolder {
 
         CardView issueCardView;
-        TextView issueNameText;
-        TextView issueDescriptionText;
+        TextView issueTitleText;
+        TextView issueBodyText;
         TextView issueDateText;
 
         ListViewHolder(View itemView) {
@@ -74,8 +79,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ListVi
             super(itemView);
 
             issueCardView = (CardView) itemView.findViewById(R.id.recycler_view_cardview_container);
-            issueNameText = (TextView) itemView.findViewById(R.id.issue_name_text);
-            issueDescriptionText = (TextView) itemView.findViewById(R.id.issue_description_text);
+            issueTitleText = (TextView) itemView.findViewById(R.id.issue_name_text);
+            issueBodyText = (TextView) itemView.findViewById(R.id.issue_body_text);
             issueDateText = (TextView) itemView.findViewById(R.id.issue_date_text);
         }
     }
