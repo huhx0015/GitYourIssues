@@ -7,7 +7,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:2.0.0-alpha3'
 
-        // TODO: Must use com.android.tools.build:gradle:2.0.0-alpha3; APKs made with higher Gradle versions and installed on API23 devices will encounter a hard crash when Retrofit 2 is utilized! See links below for this issue:
+        // TODO: Must use com.android.tools.build:gradle:2.0.0-alpha3 and below; APKs made with higher Gradle versions and installed on API23 devices will encounter a hard crash when Retrofit 2 is utilized! See links below for this issue:
         // https://github.com/square/retrofit/issues/1486
         // https://code.google.com/p/android/issues/detail?id=199105
     }
