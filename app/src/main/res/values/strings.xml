@@ -1,9 +1,12 @@
 <resources>
     <string name="app_name">Git Your Issues</string>
-    <string name="action_settings">Settings</string>
 
     <string name="repo_name">RxJava</string>
     <string name="repo_author">ReactiveX</string>
 
     <string name="open_issues">Open Issues: </string>
+    <string name="open_issues_snackbar_message">%d issues found.</string>
+
+    <string name="comments_title">Comments</string>
+    <string name="comments_error">No comments were found for this issue.</string>
 </resources>

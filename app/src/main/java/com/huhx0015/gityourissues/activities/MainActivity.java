@@ -1,16 +1,18 @@
 package com.huhx0015.gityourissues.activities;
 
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.huhx0015.gityourissues.R;
@@ -35,18 +37,19 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
-    private GitQueryTask queryTask;
+    private IssuesQueryTask queryTask;
     private List<Issue> issuesListResult;
     private String currentState = GitConstants.GIT_STATE_OPEN;
 
-    @Bind(R.id.git_main_activity_fab_button) FloatingActionButton gitFabButton;
-    @Bind(R.id.git_main_activity_progress_indicator) ProgressBar gitProgressBar;
-    @Bind(R.id.git_main_activity_recycler_view) RecyclerView gitRecyclerView;
-    @Bind(R.id.repo_name_text) TextView gitRepoName;
-    @Bind(R.id.repo_author_text) TextView gitRepoAuthor;
-    @Bind(R.id.repo_open_issues_text) TextView gitOpenIssuesLabelText;
-    @Bind(R.id.repo_open_issues_value_text) TextView gitOpenIssuesValueText;
-    @Bind(R.id.git_main_activity_toolbar) Toolbar gitToolbar;
+    @Bind(R.id.git_main_activity_layout) CoordinatorLayout mainLayout;
+    @Bind(R.id.git_main_activity_fab_button) FloatingActionButton mainFabButton;
+    @Bind(R.id.git_main_activity_open_issue_container) LinearLayout mainOpenIssuesContainer;
+    @Bind(R.id.git_main_activity_progress_indicator) ProgressBar mainProgressBar;
+    @Bind(R.id.git_main_activity_recycler_view) RecyclerView mainRecyclerView;
+    @Bind(R.id.repo_name_text) TextView mainRepoName;
+    @Bind(R.id.repo_author_text) TextView mainRepoAuthor;
+    @Bind(R.id.repo_open_issues_value_text) TextView mainOpenIssuesValueText;
+    @Bind(R.id.git_main_activity_toolbar) Toolbar mainToolbar;
 
     /** ACTIVITY LIFECYCLE METHODS _____________________________________________________________ **/
 
@@ -55,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         initLayout();
+        initText();
         initButtons();
     }
 
@@ -70,61 +74,47 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /** ACTIVITY OVERRIDDEN METHODS ____________________________________________________________ **/
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
     /** LAYOUT METHODS _________________________________________________________________________ **/
 
     private void initLayout() {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        setSupportActionBar(gitToolbar);
+        setSupportActionBar(mainToolbar);
     }
 
     private void initButtons() {
 
         // FLOATING ACTION BUTTON:
-        gitFabButton.setOnClickListener(new View.OnClickListener() {
+        mainFabButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-                queryTask = new GitQueryTask();
+                queryTask = new IssuesQueryTask();
                 queryTask.execute();
-
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
             }
         });
     }
 
+    private void initText() {
+        mainRepoName.setText(GitConstants.GIT_REPO);
+        mainRepoName.setShadowLayer(4, 2, 2, Color.BLACK);
+        mainRepoAuthor.setShadowLayer(4, 2, 2, Color.BLACK);
+        mainRepoAuthor.setText(GitConstants.GIT_USER);
+    }
+
+    private void displaySnackbar() {
+        Snackbar.make(mainLayout, String.format(getResources().getString(R.string.open_issues_snackbar_message), issuesListResult.size()), Snackbar.LENGTH_LONG).show();
+    }
+
     private void updateView(boolean issuesReceived) {
 
-        gitProgressBar.setVisibility(View.GONE);
+        mainProgressBar.setVisibility(View.GONE);
 
         if (issuesReceived) {
             initRecyclerView();
             setRecyclerList(issuesListResult);
+            mainOpenIssuesValueText.setText(" " + issuesListResult.size());
+            mainOpenIssuesContainer.setVisibility(View.VISIBLE);
         }
     }
 
@@ -132,12 +122,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void initRecyclerView() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        gitRecyclerView.setLayoutManager(layoutManager);
+        mainRecyclerView.setLayoutManager(layoutManager);
     }
 
     private void setRecyclerList(List<Issue> issueList){
         IssuesAdapter recyclerAdapter = new IssuesAdapter(issueList, this);
-        gitRecyclerView.setAdapter(recyclerAdapter);
+        mainRecyclerView.setAdapter(recyclerAdapter);
     }
 
     /** RETROFIT METHODS _______________________________________________________________________ **/
@@ -164,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
 
     /** SUBCLASSES _____________________________________________________________________________ **/
 
-    class GitQueryTask extends AsyncTask<Void, Void, Void> {
+    class IssuesQueryTask extends AsyncTask<Void, Void, Void> {
 
         boolean isError = false;
 
@@ -172,18 +162,18 @@ public class MainActivity extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
 
-            gitProgressBar.setVisibility(View.VISIBLE);
+            mainProgressBar.setVisibility(View.VISIBLE);
         }
 
         @Override
         protected Void doInBackground(Void... params) {
 
             try {
-                Log.d(LOG_TAG, "QueryTask(): Retrieving issues in " + GitConstants.GIT_REPO + " from GitHub...");
+                Log.d(LOG_TAG, "IssuesQueryTask(): Retrieving issues in " + GitConstants.GIT_REPO + " from GitHub...");
                 retrieveIssues();
             } catch (Exception e) {
                 isError = true;
-                Log.e(LOG_TAG, "QueryTask(): An exception error occurred: " + e);
+                Log.e(LOG_TAG, "IssuesQueryTask(): An exception error occurred: " + e);
             }
 
             return null;
@@ -200,6 +190,7 @@ public class MainActivity extends AppCompatActivity {
                     public void run() {
 
                         if (!isError) {
+                            displaySnackbar();
                             updateView(true);
                         }
                     }

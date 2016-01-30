@@ -3,7 +3,6 @@ package com.huhx0015.gityourissues.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-
 import javax.annotation.Generated;
 
 /**
@@ -98,5 +97,4 @@ public class PullRequest {
     public void setPatchUrl(String patchUrl) {
         this.patchUrl = patchUrl;
     }
-
 }

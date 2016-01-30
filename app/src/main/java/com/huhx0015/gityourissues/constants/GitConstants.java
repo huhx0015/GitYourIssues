@@ -13,7 +13,6 @@ public class GitConstants {
     /** URL CONSTANTS __________________________________________________________________________ **/
 
     public final static String BASE_URL = "https://api.github.com";
-    public final static String ISSUES_URL = "/repos/" + GIT_USER + "/" + GIT_REPO + "/issues";
 
     /** ISSUE CONSTANTS ________________________________________________________________________ **/
 

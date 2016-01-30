@@ -39,7 +39,7 @@ public class IssuesAdapter extends RecyclerView.Adapter<IssuesAdapter.ListViewHo
     @Override
     public ListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_view_cardview_row, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.issues_view_cardview_row, parent, false);
 
         ListViewHolder viewHolder = new ListViewHolder(view, new ListViewHolder.OnItemViewHolderClick() {
 
@@ -86,10 +86,12 @@ public class IssuesAdapter extends RecyclerView.Adapter<IssuesAdapter.ListViewHo
 
     private void launchCommentsActivity(Issue issue) {
 
-        Gson gson = new Gson();
-
         Intent i = new Intent(context, CommentsActivity.class);
-        i.putExtra(ActivityConstants.GIT_ISSUE_CONTENT, gson.toJson(issue));
+
+        if (issue.getComments() != 0) {
+            i.putExtra(ActivityConstants.GIT_ISSUE_CONTENT, issue.getNumber());
+        }
+
         context.startActivity(i);
     }
 
@@ -108,7 +110,7 @@ public class IssuesAdapter extends RecyclerView.Adapter<IssuesAdapter.ListViewHo
 
             super(itemView);
 
-            issueCardView = (CardView) itemView.findViewById(R.id.recycler_view_cardview_container);
+            issueCardView = (CardView) itemView.findViewById(R.id.issues_view_cardview_container);
             issueTitleText = (TextView) itemView.findViewById(R.id.issue_name_text);
             issueBodyText = (TextView) itemView.findViewById(R.id.issue_body_text);
             issueDateText = (TextView) itemView.findViewById(R.id.issue_date_text);
