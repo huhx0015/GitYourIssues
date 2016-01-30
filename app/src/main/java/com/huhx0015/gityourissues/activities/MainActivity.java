@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             issuesListResult = new ArrayList<>();
             issuesListResult = apiRequest.getIssues(GitConstants.GIT_USER, GitConstants.GIT_REPO,
-                    currentState, GitConstants.GIT_SORT_UPDATED).execute().body();
+                    currentState, GitConstants.GIT_SORT_UPDATED, GitConstants.GIT_PAGE_ISSUE_LIMIT).execute().body();
         } catch (IOException e) {
             Log.e(LOG_TAG, "retrieveIssues(): Exception occurred while trying to retrieve issues: " + e);
             e.printStackTrace();

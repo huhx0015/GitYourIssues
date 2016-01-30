@@ -16,6 +16,7 @@ public class GitConstants {
 
     /** ISSUE CONSTANTS ________________________________________________________________________ **/
 
+    public final static int GIT_PAGE_ISSUE_LIMIT = 100;
     public final static String GIT_STATE_OPEN = "open";
     public final static String GIT_STATE_CLOSED = "closed";
     public final static String GIT_STATE_ALL = "all";

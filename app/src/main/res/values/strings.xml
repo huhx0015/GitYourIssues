@@ -4,8 +4,8 @@
     <string name="repo_name">RxJava</string>
     <string name="repo_author">ReactiveX</string>
 
-    <string name="open_issues">Open Issues: </string>
-    <string name="open_issues_snackbar_message">%d issues found.</string>
+    <string name="open_issues">Open Issues Displayed: </string>
+    <string name="open_issues_snackbar_message">Top %d issues displayed.</string>
 
     <string name="comments_title">Comments</string>
     <string name="comments_error">No comments were found for this issue.</string>

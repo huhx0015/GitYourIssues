@@ -2,6 +2,6 @@
 <resources>
     <color name="colorPrimary">#607D8B</color>
     <color name="colorPrimaryDark">#37474F</color>
-    <color name="colorAccent">#0091EA</color>
-    <color name="colorHighlightedCard">#BBDEFB</color>
+    <color name="colorAccent">@android:color/holo_red_dark</color>
+    <color name="colorHighlightedCard">#FF80AB</color>
 </resources>
