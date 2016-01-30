@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import com.google.gson.Gson;
 import com.huhx0015.gityourissues.R;
 import com.huhx0015.gityourissues.activities.CommentsActivity;
 import com.huhx0015.gityourissues.constants.ActivityConstants;

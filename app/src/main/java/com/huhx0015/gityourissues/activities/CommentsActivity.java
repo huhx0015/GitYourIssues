@@ -1,6 +1,5 @@
 package com.huhx0015.gityourissues.activities;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,7 +10,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
 import com.huhx0015.gityourissues.R;
 import com.huhx0015.gityourissues.constants.ActivityConstants;
 import com.huhx0015.gityourissues.constants.GitConstants;
@@ -19,12 +17,14 @@ import com.huhx0015.gityourissues.interfaces.RetrofitInterface;
 import com.huhx0015.gityourissues.models.Comment;
 import com.huhx0015.gityourissues.ui.CommentsAdapter;
 import com.squareup.okhttp.OkHttpClient;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import retrofit.Call;
+import retrofit.Callback;
 import retrofit.GsonConverterFactory;
+import retrofit.Response;
 import retrofit.Retrofit;
 
 /**
@@ -34,8 +34,6 @@ public class CommentsActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = CommentsActivity.class.getSimpleName();
 
-    private CommentsQueryTask queryTask;
-    private final int apiLevel = android.os.Build.VERSION.SDK_INT;
     private List<Comment> commentsListResult;
     private int currentIssue = 0;
 
@@ -55,22 +53,10 @@ public class CommentsActivity extends AppCompatActivity {
         }
 
         if (currentIssue != 0) {
-            queryTask = new CommentsQueryTask();
-            queryTask.execute();
+            commentsProgressBar.setVisibility(View.VISIBLE);
+            retrieveComments();
         } else {
             commentsErrorText.setVisibility(View.VISIBLE);
-        }
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        if (null != queryTask) {
-            if (queryTask.getStatus() == AsyncTask.Status.RUNNING) {
-                queryTask.cancel(true);
-                Log.d(LOG_TAG, "onStop(): AsyncTask has been cancelled.");
-            }
         }
     }
 
@@ -123,7 +109,7 @@ public class CommentsActivity extends AppCompatActivity {
 
     /** RETROFIT METHODS _______________________________________________________________________ **/
 
-    private void retrieveIssues() {
+    private void retrieveComments() {
 
         Retrofit retrofitAdapter = new Retrofit.Builder()
                 .baseUrl(GitConstants.BASE_URL)
@@ -131,69 +117,30 @@ public class CommentsActivity extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
+        commentsListResult = new ArrayList<>();
+
         RetrofitInterface apiRequest = retrofitAdapter.create(RetrofitInterface.class);
+        Call<List<Comment>> call = apiRequest.getComments(GitConstants.GIT_USER, GitConstants.GIT_REPO,
+                currentIssue, GitConstants.GIT_SORT_UPDATED);
 
-        try {
-            commentsListResult = new ArrayList<>();
+        call.enqueue(new Callback<List<Comment>>() {
 
-            // TODO: Hard crashes witnessed with Android emulators running on API 23 when using @Query sort with Retrofit 2; overloaded alternate Retrofit call is used instead for API 23 devices.
-            if (apiLevel >= 23) {
-                commentsListResult = apiRequest.getComments(GitConstants.GIT_USER, GitConstants.GIT_REPO,
-                        currentIssue).execute().body();
-            } else {
-                commentsListResult = apiRequest.getComments(GitConstants.GIT_USER, GitConstants.GIT_REPO,
-                        currentIssue, GitConstants.GIT_SORT_UPDATED).execute().body();
+            @Override
+            public void onResponse(Response<List<Comment>> response, Retrofit retrofit) {
+                if (response.isSuccess()) {
+                    commentsListResult = response.body();
+                    updateView(true);
+
+                    Log.d(LOG_TAG, "retrieveComments(): Retrieved comments in " + GitConstants.GIT_REPO + " from GitHub.");
+                } else {
+                    Log.e(LOG_TAG, "retrieveComments(): ERROR: " + response.message());
+                }
             }
 
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "retrieveIssues(): Exception occurred while trying to retrieve issues: " + e);
-            e.printStackTrace();
-        }
-    }
-
-    /** SUBCLASSES _____________________________________________________________________________ **/
-
-    class CommentsQueryTask extends AsyncTask<Void, Void, Void> {
-
-        boolean isError = false;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            commentsProgressBar.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-
-            try {
-                Log.d(LOG_TAG, "CommentsQueryTask(): Retrieving comments in " + GitConstants.GIT_REPO + " from GitHub...");
-                retrieveIssues();
-            } catch (Exception e) {
-                isError = true;
-                Log.e(LOG_TAG, "CommentsQueryTask(): An exception error occurred: " + e);
+            @Override
+            public void onFailure(Throwable t) {
+                Log.e(LOG_TAG, "retrieveComments(): ERROR: " + t.getMessage());
             }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-
-            if (!isCancelled()) {
-
-                runOnUiThread(new Runnable() {
-
-                    public void run() {
-
-                        if (!isError) {
-                            updateView(true);
-                        }
-                    }
-                });
-            }
-        }
+        });
     }
 }

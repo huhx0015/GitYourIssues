@@ -1,7 +1,6 @@
 package com.huhx0015.gityourissues.activities;
 
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -20,14 +19,15 @@ import com.huhx0015.gityourissues.constants.GitConstants;
 import com.huhx0015.gityourissues.interfaces.RetrofitInterface;
 import com.huhx0015.gityourissues.models.Issue;
 import com.huhx0015.gityourissues.ui.IssuesAdapter;
-import com.huhx0015.gityourissues.util.IssuesUtil;
 import com.squareup.okhttp.OkHttpClient;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import retrofit.Call;
+import retrofit.Callback;
 import retrofit.GsonConverterFactory;
+import retrofit.Response;
 import retrofit.Retrofit;
 
 /**
@@ -38,8 +38,6 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
-    private final int apiLevel = android.os.Build.VERSION.SDK_INT;
-    private IssuesQueryTask queryTask;
     private List<Issue> issuesListResult;
     private String currentState = GitConstants.GIT_STATE_OPEN;
 
@@ -64,18 +62,6 @@ public class MainActivity extends AppCompatActivity {
         initButtons();
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        if (null != queryTask) {
-            if (queryTask.getStatus() == AsyncTask.Status.RUNNING) {
-                queryTask.cancel(true);
-                Log.d(LOG_TAG, "onStop(): AsyncTask has been cancelled.");
-            }
-        }
-    }
-
     /** LAYOUT METHODS _________________________________________________________________________ **/
 
     private void initLayout() {
@@ -91,8 +77,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                queryTask = new IssuesQueryTask();
-                queryTask.execute();
+                mainProgressBar.setVisibility(View.VISIBLE);
+                retrieveIssues();
             }
         });
     }
@@ -117,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
             setRecyclerList(issuesListResult);
             mainOpenIssuesValueText.setText(" " + issuesListResult.size());
             mainOpenIssuesContainer.setVisibility(View.VISIBLE);
+            displaySnackbar();
         }
     }
 
@@ -142,69 +129,30 @@ public class MainActivity extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        RetrofitInterface apiRequest = retrofitAdapter.create(RetrofitInterface.class);
         issuesListResult = new ArrayList<>();
 
-        try {
+        RetrofitInterface apiRequest = retrofitAdapter.create(RetrofitInterface.class);
+        Call<List<Issue>> call = apiRequest.getIssues(GitConstants.GIT_USER, GitConstants.GIT_REPO,
+                GitConstants.GIT_SORT_UPDATED, currentState, GitConstants.GIT_PAGE_ISSUE_LIMIT);
 
-            // TODO: Hard crashes witnessed with Android emulators running on API 23 when using @Query sort & state with Retrofit 2; overloaded alternate Retrofit call is used instead for API 23 devices.
-            if (apiLevel >= 23) {
-                issuesListResult = apiRequest.getIssues(GitConstants.GIT_USER, GitConstants.GIT_REPO).execute().body();
-                issuesListResult = IssuesUtil.filterIssueList(issuesListResult, currentState); // NOTE: Fallback method to filter the list for API 23.
-            } else {
-                issuesListResult = apiRequest.getIssues(GitConstants.GIT_USER, GitConstants.GIT_REPO,
-                        currentState, GitConstants.GIT_SORT_UPDATED, GitConstants.GIT_PAGE_ISSUE_LIMIT).execute().body();
-            }
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "retrieveIssues(): Exception occurred while trying to retrieve issues: " + e);
-            e.printStackTrace();
-        }
-    }
+        call.enqueue(new Callback<List<Issue>>() {
 
-    /** SUBCLASSES _____________________________________________________________________________ **/
+            @Override
+            public void onResponse(Response<List<Issue>> response, Retrofit retrofit) {
+                if (response.isSuccess()) {
+                    issuesListResult = response.body();
+                    updateView(true);
 
-    class IssuesQueryTask extends AsyncTask<Void, Void, Void> {
-
-        boolean isError = false;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            mainProgressBar.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-
-            try {
-                Log.d(LOG_TAG, "IssuesQueryTask(): Retrieving issues in " + GitConstants.GIT_REPO + " from GitHub...");
-                retrieveIssues();
-            } catch (Exception e) {
-                isError = true;
-                Log.e(LOG_TAG, "IssuesQueryTask(): An exception error occurred: " + e);
+                    Log.d(LOG_TAG, "retrieveIssues(): Retrieved issues in " + GitConstants.GIT_REPO + " from GitHub.");
+                } else {
+                    Log.e(LOG_TAG, "retrieveIssues(): ERROR: " + response.message());
+                }
             }
 
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-
-            if (!isCancelled()) {
-
-                runOnUiThread(new Runnable() {
-
-                    public void run() {
-
-                        if (!isError) {
-                            displaySnackbar();
-                            updateView(true);
-                        }
-                    }
-                });
+            @Override
+            public void onFailure(Throwable t) {
+                Log.e(LOG_TAG, "retrieveIssues(): ERROR: " + t.getMessage());
             }
-        }
+        });
     }
 }

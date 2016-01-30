@@ -20,7 +20,12 @@ public interface RetrofitInterface {
     // GET /repos/:owner/:repo/issues
     @GET("/repos/{owner}/{repo}/issues")
     Call<List<Issue>> getIssues(@Path("owner") String owner, @Path("repo") String repo,
-                                @Query("state") String state, @Query("sort") String sort, @Query("per_page") int num);
+                                @Query("sort") String sort, @Query("state") String state, @Query("per_page") int num);
+
+    // GET /repos/:owner/:repo/issues
+    @GET("/repos/{owner}/{repo}/issues")
+    Call<List<Issue>> getIssues(@Path("owner") String owner, @Path("repo") String repo,
+                                @Query("per_page") int num);
 
     // GET /repos/:owner/:repo/issues
     @GET("/repos/{owner}/{repo}/issues/{id}/comments")
