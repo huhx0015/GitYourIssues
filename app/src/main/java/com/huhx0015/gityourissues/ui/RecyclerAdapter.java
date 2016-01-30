@@ -44,7 +44,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ListVi
         String issueTitle = issueList.get(position).getTitle();
         String issueDate = issueList.get(position).getUpdatedAt();
         String issueBody = issueList.get(position).getBody();
-        issueBody = issueBody.substring(0, 140);
+
+        if (issueBody.length() > 140) {
+            issueBody = issueBody.substring(0, 140);
+        }
 
         holder.issueTitleText.setText(issueTitle);
         holder.issueBodyText.setText(issueBody);
