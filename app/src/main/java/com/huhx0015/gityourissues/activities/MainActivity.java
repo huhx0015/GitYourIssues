@@ -1,6 +1,5 @@
 package com.huhx0015.gityourissues.activities;
 
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -14,13 +13,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import com.google.gson.Gson;
 import com.huhx0015.gityourissues.R;
-import com.huhx0015.gityourissues.constants.ActivityConstants;
 import com.huhx0015.gityourissues.constants.GitConstants;
 import com.huhx0015.gityourissues.interfaces.RetrofitInterface;
 import com.huhx0015.gityourissues.models.Issue;
-import com.huhx0015.gityourissues.ui.RecyclerAdapter;
+import com.huhx0015.gityourissues.ui.IssuesAdapter;
 import com.squareup.okhttp.OkHttpClient;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
     private GitQueryTask queryTask;
     private List<Issue> issuesListResult;
+    private String currentState = GitConstants.GIT_STATE_OPEN;
 
     @Bind(R.id.git_main_activity_fab_button) FloatingActionButton gitFabButton;
     @Bind(R.id.git_main_activity_progress_indicator) ProgressBar gitProgressBar;
@@ -138,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setRecyclerList(List<Issue> issueList){
-        RecyclerAdapter recyclerAdapter = new RecyclerAdapter(issueList, this);
+        IssuesAdapter recyclerAdapter = new IssuesAdapter(issueList, this);
         gitRecyclerView.setAdapter(recyclerAdapter);
     }
 
@@ -156,7 +154,8 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             issuesListResult = new ArrayList<>();
-            issuesListResult = apiRequest.getIssues(GitConstants.GIT_USER, GitConstants.GIT_REPO).execute().body();
+            issuesListResult = apiRequest.getIssues(GitConstants.GIT_USER, GitConstants.GIT_REPO,
+                    currentState, GitConstants.GIT_SORT_UPDATED).execute().body();
         } catch (IOException e) {
             Log.e(LOG_TAG, "retrieveIssues(): Exception occurred while trying to retrieve issues: " + e);
             e.printStackTrace();

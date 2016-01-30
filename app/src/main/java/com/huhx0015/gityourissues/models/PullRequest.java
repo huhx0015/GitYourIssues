@@ -25,6 +25,8 @@ public class PullRequest {
     @SerializedName("patch_url")
     @Expose private String patchUrl;
 
+    /** GET / SET METHODS ______________________________________________________________________ **/
+
     /**
      * 
      * @return

@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import com.google.gson.Gson;
 import com.huhx0015.gityourissues.R;
-import com.huhx0015.gityourissues.activities.IssueActivity;
+import com.huhx0015.gityourissues.activities.CommentsActivity;
 import com.huhx0015.gityourissues.constants.ActivityConstants;
 import com.huhx0015.gityourissues.models.Issue;
 import java.util.List;
@@ -20,16 +20,16 @@ import java.util.List;
  * Created by Michael Yoon Huh on 1/29/2016.
  */
 
-public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ListViewHolder> {
+public class IssuesAdapter extends RecyclerView.Adapter<IssuesAdapter.ListViewHolder> {
 
-    private static final String LOG_TAG = RecyclerAdapter.class.getSimpleName();
+    private static final String LOG_TAG = IssuesAdapter.class.getSimpleName();
 
     private Context context;
     private List<Issue> issueList;
 
     /** CONSTRUCTOR METHODS ____________________________________________________________________ **/
 
-    public RecyclerAdapter(List<Issue> list, Context context){
+    public IssuesAdapter(List<Issue> list, Context context){
         this.context = context;
         this.issueList = list;
     }
@@ -45,7 +45,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ListVi
 
             @Override
             public void onItemClick(View caller, int position) {
-                launchIssueActivity(issueList.get(position));
+                launchCommentsActivity(issueList.get(position));
             }
         });
 
@@ -55,7 +55,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ListVi
     @Override
     public void onBindViewHolder(ListViewHolder holder, int position) {
 
-        String issueTitle = issueList.get(position).getTitle();
+        String issueTitle = "#" + issueList.get(position).getNumber() + ": " + issueList.get(position).getTitle();
         String issueDate = issueList.get(position).getUpdatedAt();
         String issueBody = issueList.get(position).getBody();
 
@@ -84,11 +84,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ListVi
 
     /** INTENT METHODS _________________________________________________________________________ **/
 
-    private void launchIssueActivity(Issue issue) {
+    private void launchCommentsActivity(Issue issue) {
 
         Gson gson = new Gson();
 
-        Intent i = new Intent(context, IssueActivity.class);
+        Intent i = new Intent(context, CommentsActivity.class);
         i.putExtra(ActivityConstants.GIT_ISSUE_CONTENT, gson.toJson(issue));
         context.startActivity(i);
     }

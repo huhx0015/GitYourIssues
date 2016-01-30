@@ -63,6 +63,8 @@ public class User {
     @SerializedName("site_admin")
     @Expose private boolean siteAdmin;
 
+    /** GET / SET METHODS ______________________________________________________________________ **/
+
     /**
      * 
      * @return

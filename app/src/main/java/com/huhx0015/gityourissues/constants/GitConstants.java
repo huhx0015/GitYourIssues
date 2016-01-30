@@ -14,4 +14,13 @@ public class GitConstants {
 
     public final static String BASE_URL = "https://api.github.com";
     public final static String ISSUES_URL = "/repos/" + GIT_USER + "/" + GIT_REPO + "/issues";
+
+    /** ISSUE CONSTANTS ________________________________________________________________________ **/
+
+    public final static String GIT_STATE_OPEN = "open";
+    public final static String GIT_STATE_CLOSED = "closed";
+    public final static String GIT_STATE_ALL = "all";
+    public final static String GIT_SORT_CREATED = "created";
+    public final static String GIT_SORT_UPDATED = "updated";
+    public final static String GIT_SORT_COMMENTS = "comments";
 }

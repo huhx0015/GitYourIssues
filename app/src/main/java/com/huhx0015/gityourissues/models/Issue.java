@@ -74,6 +74,8 @@ public class Issue {
     @SerializedName("body")
     @Expose private String body;
 
+    /** GET / SET METHODS ______________________________________________________________________ **/
+
     /**
      * 
      * @return
@@ -433,5 +435,4 @@ public class Issue {
     public void setBody(String body) {
         this.body = body;
     }
-
 }
