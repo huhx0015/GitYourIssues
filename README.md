@@ -1,4 +1,4 @@
-QuickAlphaPost
+Git Your Issues
 ========================
 
 DEVELOPER: Michael Yoon Huh
