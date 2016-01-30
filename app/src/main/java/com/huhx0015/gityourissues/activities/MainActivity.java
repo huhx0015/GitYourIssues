@@ -20,6 +20,7 @@ import com.huhx0015.gityourissues.constants.GitConstants;
 import com.huhx0015.gityourissues.interfaces.RetrofitInterface;
 import com.huhx0015.gityourissues.models.Issue;
 import com.huhx0015.gityourissues.ui.IssuesAdapter;
+import com.huhx0015.gityourissues.util.IssuesUtil;
 import com.squareup.okhttp.OkHttpClient;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
+    private final int apiLevel = android.os.Build.VERSION.SDK_INT;
     private IssuesQueryTask queryTask;
     private List<Issue> issuesListResult;
     private String currentState = GitConstants.GIT_STATE_OPEN;
@@ -141,11 +143,18 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         RetrofitInterface apiRequest = retrofitAdapter.create(RetrofitInterface.class);
+        issuesListResult = new ArrayList<>();
 
         try {
-            issuesListResult = new ArrayList<>();
-            issuesListResult = apiRequest.getIssues(GitConstants.GIT_USER, GitConstants.GIT_REPO,
-                    currentState, GitConstants.GIT_SORT_UPDATED, GitConstants.GIT_PAGE_ISSUE_LIMIT).execute().body();
+
+            // TODO: Hard crashes witnessed with Android emulators running on API 23 when using @Query sort & state with Retrofit 2; overloaded alternate Retrofit call is used instead for API 23 devices.
+            if (apiLevel >= 23) {
+                issuesListResult = apiRequest.getIssues(GitConstants.GIT_USER, GitConstants.GIT_REPO).execute().body();
+                issuesListResult = IssuesUtil.filterIssueList(issuesListResult, currentState); // NOTE: Fallback method to filter the list for API 23.
+            } else {
+                issuesListResult = apiRequest.getIssues(GitConstants.GIT_USER, GitConstants.GIT_REPO,
+                        currentState, GitConstants.GIT_SORT_UPDATED, GitConstants.GIT_PAGE_ISSUE_LIMIT).execute().body();
+            }
         } catch (IOException e) {
             Log.e(LOG_TAG, "retrieveIssues(): Exception occurred while trying to retrieve issues: " + e);
             e.printStackTrace();

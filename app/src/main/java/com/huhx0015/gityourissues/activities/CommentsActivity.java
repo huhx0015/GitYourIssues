@@ -35,6 +35,7 @@ public class CommentsActivity extends AppCompatActivity {
     private static final String LOG_TAG = CommentsActivity.class.getSimpleName();
 
     private CommentsQueryTask queryTask;
+    private final int apiLevel = android.os.Build.VERSION.SDK_INT;
     private List<Comment> commentsListResult;
     private int currentIssue = 0;
 
@@ -134,8 +135,16 @@ public class CommentsActivity extends AppCompatActivity {
 
         try {
             commentsListResult = new ArrayList<>();
-            commentsListResult = apiRequest.getComments(GitConstants.GIT_USER, GitConstants.GIT_REPO,
-                    currentIssue, GitConstants.GIT_SORT_UPDATED).execute().body();
+
+            // TODO: Hard crashes witnessed with Android emulators running on API 23 when using @Query sort with Retrofit 2; overloaded alternate Retrofit call is used instead for API 23 devices.
+            if (apiLevel >= 23) {
+                commentsListResult = apiRequest.getComments(GitConstants.GIT_USER, GitConstants.GIT_REPO,
+                        currentIssue).execute().body();
+            } else {
+                commentsListResult = apiRequest.getComments(GitConstants.GIT_USER, GitConstants.GIT_REPO,
+                        currentIssue, GitConstants.GIT_SORT_UPDATED).execute().body();
+            }
+
         } catch (IOException e) {
             Log.e(LOG_TAG, "retrieveIssues(): Exception occurred while trying to retrieve issues: " + e);
             e.printStackTrace();
