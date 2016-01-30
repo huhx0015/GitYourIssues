@@ -35,7 +35,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/issue_name_text"
-                    android:textSize="18sp"
+                    android:textSize="14sp"
                     android:typeface="sans"
                     android:textColor="@android:color/black" />
 
@@ -43,7 +43,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/issue_body_text"
-                    android:textSize="16sp"
+                    android:textSize="12sp"
                     android:typeface="sans" />
 
                 <TextView

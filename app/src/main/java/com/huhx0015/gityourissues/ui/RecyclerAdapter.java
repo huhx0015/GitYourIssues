@@ -1,6 +1,7 @@
 package com.huhx0015.gityourissues.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -8,7 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import com.google.gson.Gson;
 import com.huhx0015.gityourissues.R;
+import com.huhx0015.gityourissues.activities.IssueActivity;
+import com.huhx0015.gityourissues.constants.ActivityConstants;
 import com.huhx0015.gityourissues.models.Issue;
 import java.util.List;
 
@@ -34,8 +38,18 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ListVi
 
     @Override
     public ListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_view_cardview_row, parent, false);
-        return new ListViewHolder(view);
+
+        ListViewHolder viewHolder = new ListViewHolder(view, new ListViewHolder.OnItemViewHolderClick() {
+
+            @Override
+            public void onItemClick(View caller, int position) {
+                launchIssueActivity(issueList.get(position));
+            }
+        });
+
+        return viewHolder;
     }
 
     @Override
@@ -46,7 +60,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ListVi
         String issueBody = issueList.get(position).getBody();
 
         if (issueBody.length() > 140) {
-            issueBody = issueBody.substring(0, 140);
+            issueBody = issueBody.substring(0, 140) + "...";
         }
 
         holder.issueTitleText.setText(issueTitle);
@@ -68,16 +82,29 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ListVi
         super.onAttachedToRecyclerView(recyclerView);
     }
 
+    /** INTENT METHODS _________________________________________________________________________ **/
+
+    private void launchIssueActivity(Issue issue) {
+
+        Gson gson = new Gson();
+
+        Intent i = new Intent(context, IssueActivity.class);
+        i.putExtra(ActivityConstants.GIT_ISSUE_CONTENT, gson.toJson(issue));
+        context.startActivity(i);
+    }
+
     /** SUBCLASSES _____________________________________________________________________________ **/
 
-    public static class ListViewHolder extends RecyclerView.ViewHolder {
+    public static class ListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         CardView issueCardView;
         TextView issueTitleText;
         TextView issueBodyText;
         TextView issueDateText;
 
-        ListViewHolder(View itemView) {
+        public OnItemViewHolderClick resultItemListener;
+
+        ListViewHolder(View itemView, OnItemViewHolderClick listener) {
 
             super(itemView);
 
@@ -85,6 +112,21 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ListVi
             issueTitleText = (TextView) itemView.findViewById(R.id.issue_name_text);
             issueBodyText = (TextView) itemView.findViewById(R.id.issue_body_text);
             issueDateText = (TextView) itemView.findViewById(R.id.issue_date_text);
+
+            if (listener != null) {
+                resultItemListener = listener;
+                itemView.setOnClickListener(this);
+            }
+        }
+
+        @Override
+        public void onClick(View v) {
+            int itemPos = getAdapterPosition();
+            resultItemListener.onItemClick(v, itemPos);
+        }
+
+        public interface OnItemViewHolderClick {
+            void onItemClick(View caller, int position);
         }
     }
 }

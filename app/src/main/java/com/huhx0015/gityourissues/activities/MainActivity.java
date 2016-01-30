@@ -163,17 +163,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /** INTENT METHODS _________________________________________________________________________ **/
-
-    private void launchIssueActivity(Issue issue) {
-
-        Gson gson = new Gson();
-
-        Intent i = new Intent(this, IssueActivity.class);
-        i.putExtra(ActivityConstants.GIT_ISSUE_CONTENT, gson.toJson(issue));
-        startActivity(i);
-    }
-
     /** SUBCLASSES _____________________________________________________________________________ **/
 
     class GitQueryTask extends AsyncTask<Void, Void, Void> {
