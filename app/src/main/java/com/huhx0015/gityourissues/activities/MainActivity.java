@@ -23,12 +23,14 @@ import java.util.ArrayList;
 import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import okhttp3.OkHttpClient;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import rx.Observable;
+import rx.Subscriber;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by Michael Yoon Huh on 1/29/2016.
@@ -125,34 +127,37 @@ public class MainActivity extends AppCompatActivity {
 
         Retrofit retrofitAdapter = new Retrofit.Builder()
                 .baseUrl(GitConstants.BASE_URL)
-                .client(new OkHttpClient())
                 .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.createWithScheduler(Schedulers.io()))
                 .build();
 
         issuesListResult = new ArrayList<>();
 
         RetrofitInterface apiRequest = retrofitAdapter.create(RetrofitInterface.class);
-        Call<List<Issue>> call = apiRequest.getIssues(GitConstants.GIT_USER, GitConstants.GIT_REPO,
+        Observable<List<Issue>> call = apiRequest.getIssues(GitConstants.GIT_USER, GitConstants.GIT_REPO,
                 GitConstants.GIT_SORT_UPDATED, currentState, GitConstants.GIT_PAGE_ISSUE_LIMIT);
 
-        call.enqueue(new Callback<List<Issue>>() {
+        Subscription subscription = call.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<Issue>>() {
+                    @Override
+                    public void onCompleted() {}
 
-            @Override
-            public void onResponse(retrofit2.Call<List<Issue>> call, Response<List<Issue>> response) {
-                if (response.isSuccessful()) {
-                    issuesListResult = response.body();
-                    updateView(true);
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e(LOG_TAG, "retrieveIssues(): ERROR: " + e.getMessage());
+                    }
 
-                    Log.d(LOG_TAG, "retrieveIssues(): Retrieved issues in " + GitConstants.GIT_REPO + " from GitHub.");
-                } else {
-                    Log.e(LOG_TAG, "retrieveIssues(): ERROR: " + response.message());
-                }
-            }
-
-            @Override
-            public void onFailure(retrofit2.Call<List<Issue>> call, Throwable t) {
-                Log.e(LOG_TAG, "retrieveIssues(): ERROR: " + t.getMessage());
-            }
-        });
+                    @Override
+                    public void onNext(List<Issue> issues) {
+                        issuesListResult = issues;
+                        if (issues != null) {
+                            updateView(true);
+                            Log.d(LOG_TAG, "retrieveIssues(): Retrieved issues in " + GitConstants.GIT_REPO + " from GitHub.");
+                        } else {
+                            Log.e(LOG_TAG, "retrieveIssues(): ERROR: The retrieved issues were null.");
+                        }
+                    }
+                });
     }
 }

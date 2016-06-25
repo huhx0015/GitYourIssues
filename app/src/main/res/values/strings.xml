@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Git Your Issues</string>
+    <string name="app_name">Git Your Rx Issues</string>
 
     <string name="repo_name">RxJava</string>
     <string name="repo_author">ReactiveX</string>

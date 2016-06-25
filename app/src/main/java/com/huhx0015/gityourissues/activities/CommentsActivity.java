@@ -20,12 +20,14 @@ import java.util.ArrayList;
 import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import okhttp3.OkHttpClient;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import rx.Observable;
+import rx.Subscriber;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by Michael Yoon Huh on 1/29/2016.
@@ -113,34 +115,37 @@ public class CommentsActivity extends AppCompatActivity {
 
         Retrofit retrofitAdapter = new Retrofit.Builder()
                 .baseUrl(GitConstants.BASE_URL)
-                .client(new OkHttpClient())
                 .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.createWithScheduler(Schedulers.io()))
                 .build();
 
         commentsListResult = new ArrayList<>();
 
         RetrofitInterface apiRequest = retrofitAdapter.create(RetrofitInterface.class);
-        Call<List<Comment>> call = apiRequest.getComments(GitConstants.GIT_USER, GitConstants.GIT_REPO,
+        Observable<List<Comment>> call = apiRequest.getComments(GitConstants.GIT_USER, GitConstants.GIT_REPO,
                 currentIssue, GitConstants.GIT_SORT_UPDATED);
 
-        call.enqueue(new Callback<List<Comment>>() {
+        Subscription subscription = call.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<Comment>>() {
+                    @Override
+                    public void onCompleted() {}
 
-            @Override
-            public void onResponse(Call<List<Comment>> call, Response<List<Comment>> response) {
-                if (response.isSuccessful()) {
-                    commentsListResult = response.body();
-                    updateView(true);
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e(LOG_TAG, "retrieveComments(): ERROR: " + e.getMessage());
+                    }
 
-                    Log.d(LOG_TAG, "retrieveComments(): Retrieved comments in " + GitConstants.GIT_REPO + " from GitHub.");
-                } else {
-                    Log.e(LOG_TAG, "retrieveComments(): ERROR: " + response.message());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Comment>> call, Throwable t) {
-                Log.e(LOG_TAG, "retrieveComments(): ERROR: " + t.getMessage());
-            }
-        });
+                    @Override
+                    public void onNext(List<Comment> comments) {
+                        commentsListResult = comments;
+                        if (comments != null) {
+                            updateView(true);
+                            Log.d(LOG_TAG, "retrieveComments(): Retrieved issues in " + GitConstants.GIT_REPO + " from GitHub.");
+                        } else {
+                            Log.e(LOG_TAG, "retrieveComments(): ERROR: The retrieved comments were null.");
+                        }
+                    }
+                });
     }
 }
