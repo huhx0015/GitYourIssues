@@ -19,16 +19,16 @@ import com.huhx0015.gityourissues.constants.GitConstants;
 import com.huhx0015.gityourissues.interfaces.RetrofitInterface;
 import com.huhx0015.gityourissues.models.Issue;
 import com.huhx0015.gityourissues.ui.IssuesAdapter;
-import com.squareup.okhttp.OkHttpClient;
 import java.util.ArrayList;
 import java.util.List;
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit.Call;
-import retrofit.Callback;
-import retrofit.GsonConverterFactory;
-import retrofit.Response;
-import retrofit.Retrofit;
+import okhttp3.OkHttpClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by Michael Yoon Huh on 1/29/2016.
@@ -41,15 +41,15 @@ public class MainActivity extends AppCompatActivity {
     private List<Issue> issuesListResult;
     private String currentState = GitConstants.GIT_STATE_OPEN;
 
-    @Bind(R.id.git_main_activity_layout) CoordinatorLayout mainLayout;
-    @Bind(R.id.git_main_activity_fab_button) FloatingActionButton mainFabButton;
-    @Bind(R.id.git_main_activity_open_issue_container) LinearLayout mainOpenIssuesContainer;
-    @Bind(R.id.git_main_activity_progress_indicator) ProgressBar mainProgressBar;
-    @Bind(R.id.git_main_activity_recycler_view) RecyclerView mainRecyclerView;
-    @Bind(R.id.repo_name_text) TextView mainRepoName;
-    @Bind(R.id.repo_author_text) TextView mainRepoAuthor;
-    @Bind(R.id.repo_open_issues_value_text) TextView mainOpenIssuesValueText;
-    @Bind(R.id.git_main_activity_toolbar) Toolbar mainToolbar;
+    @BindView(R.id.git_main_activity_layout) CoordinatorLayout mainLayout;
+    @BindView(R.id.git_main_activity_fab_button) FloatingActionButton mainFabButton;
+    @BindView(R.id.git_main_activity_open_issue_container) LinearLayout mainOpenIssuesContainer;
+    @BindView(R.id.git_main_activity_progress_indicator) ProgressBar mainProgressBar;
+    @BindView(R.id.git_main_activity_recycler_view) RecyclerView mainRecyclerView;
+    @BindView(R.id.repo_name_text) TextView mainRepoName;
+    @BindView(R.id.repo_author_text) TextView mainRepoAuthor;
+    @BindView(R.id.repo_open_issues_value_text) TextView mainOpenIssuesValueText;
+    @BindView(R.id.git_main_activity_toolbar) Toolbar mainToolbar;
 
     /** ACTIVITY LIFECYCLE METHODS _____________________________________________________________ **/
 
@@ -138,8 +138,8 @@ public class MainActivity extends AppCompatActivity {
         call.enqueue(new Callback<List<Issue>>() {
 
             @Override
-            public void onResponse(Response<List<Issue>> response, Retrofit retrofit) {
-                if (response.isSuccess()) {
+            public void onResponse(retrofit2.Call<List<Issue>> call, Response<List<Issue>> response) {
+                if (response.isSuccessful()) {
                     issuesListResult = response.body();
                     updateView(true);
 
@@ -150,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Throwable t) {
+            public void onFailure(retrofit2.Call<List<Issue>> call, Throwable t) {
                 Log.e(LOG_TAG, "retrieveIssues(): ERROR: " + t.getMessage());
             }
         });

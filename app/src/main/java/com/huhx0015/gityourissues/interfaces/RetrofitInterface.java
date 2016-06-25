@@ -3,10 +3,10 @@ package com.huhx0015.gityourissues.interfaces;
 import com.huhx0015.gityourissues.models.Comment;
 import com.huhx0015.gityourissues.models.Issue;
 import java.util.List;
-import retrofit.Call;
-import retrofit.http.GET;
-import retrofit.http.Path;
-import retrofit.http.Query;
+import retrofit2.Call;
+import retrofit2.http.GET;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 /**
  * Created by Michael Yoon Huh on 1/29/2016.

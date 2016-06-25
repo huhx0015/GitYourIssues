@@ -16,16 +16,16 @@ import com.huhx0015.gityourissues.constants.GitConstants;
 import com.huhx0015.gityourissues.interfaces.RetrofitInterface;
 import com.huhx0015.gityourissues.models.Comment;
 import com.huhx0015.gityourissues.ui.CommentsAdapter;
-import com.squareup.okhttp.OkHttpClient;
 import java.util.ArrayList;
 import java.util.List;
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit.Call;
-import retrofit.Callback;
-import retrofit.GsonConverterFactory;
-import retrofit.Response;
-import retrofit.Retrofit;
+import okhttp3.OkHttpClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by Michael Yoon Huh on 1/29/2016.
@@ -37,10 +37,10 @@ public class CommentsActivity extends AppCompatActivity {
     private List<Comment> commentsListResult;
     private int currentIssue = 0;
 
-    @Bind(R.id.git_comments_activity_progress_indicator) ProgressBar commentsProgressBar;
-    @Bind(R.id.git_comments_activity_recycler_view) RecyclerView commentsRecyclerView;
-    @Bind(R.id.git_comments_error_text) TextView commentsErrorText;
-    @Bind(R.id.git_comments_activity_toolbar) Toolbar commentsToolbar;
+    @BindView(R.id.git_comments_activity_progress_indicator) ProgressBar commentsProgressBar;
+    @BindView(R.id.git_comments_activity_recycler_view) RecyclerView commentsRecyclerView;
+    @BindView(R.id.git_comments_error_text) TextView commentsErrorText;
+    @BindView(R.id.git_comments_activity_toolbar) Toolbar commentsToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,8 +126,8 @@ public class CommentsActivity extends AppCompatActivity {
         call.enqueue(new Callback<List<Comment>>() {
 
             @Override
-            public void onResponse(Response<List<Comment>> response, Retrofit retrofit) {
-                if (response.isSuccess()) {
+            public void onResponse(Call<List<Comment>> call, Response<List<Comment>> response) {
+                if (response.isSuccessful()) {
                     commentsListResult = response.body();
                     updateView(true);
 
@@ -138,7 +138,7 @@ public class CommentsActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Throwable t) {
+            public void onFailure(Call<List<Comment>> call, Throwable t) {
                 Log.e(LOG_TAG, "retrieveComments(): ERROR: " + t.getMessage());
             }
         });
