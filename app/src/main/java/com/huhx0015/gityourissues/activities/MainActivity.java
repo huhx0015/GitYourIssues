@@ -1,28 +1,22 @@
 package com.huhx0015.gityourissues.activities;
 
+import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import com.huhx0015.gityourissues.R;
 import com.huhx0015.gityourissues.constants.GitConstants;
+import com.huhx0015.gityourissues.databinding.ActivityMainBinding;
 import com.huhx0015.gityourissues.interfaces.RetrofitInterface;
 import com.huhx0015.gityourissues.models.Issue;
 import com.huhx0015.gityourissues.ui.IssuesAdapter;
+import com.huhx0015.gityourissues.viewmodel.MainViewModel;
 import java.util.ArrayList;
 import java.util.List;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -36,22 +30,17 @@ import rx.schedulers.Schedulers;
  * Created by Michael Yoon Huh on 1/29/2016.
  */
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MainViewModel.MainViewModelListener {
+
+    /** CLASS VARIABLES ________________________________________________________________________ **/
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
+    private ActivityMainBinding mainActivityBinding;
+    private MainViewModel mainActivityViewModel;
+
     private List<Issue> issuesListResult;
     private String currentState = GitConstants.GIT_STATE_OPEN;
-
-    @BindView(R.id.git_main_activity_layout) CoordinatorLayout mainLayout;
-    @BindView(R.id.git_main_activity_fab_button) FloatingActionButton mainFabButton;
-    @BindView(R.id.git_main_activity_open_issue_container) LinearLayout mainOpenIssuesContainer;
-    @BindView(R.id.git_main_activity_progress_indicator) ProgressBar mainProgressBar;
-    @BindView(R.id.git_main_activity_recycler_view) RecyclerView mainRecyclerView;
-    @BindView(R.id.repo_name_text) TextView mainRepoName;
-    @BindView(R.id.repo_author_text) TextView mainRepoAuthor;
-    @BindView(R.id.repo_open_issues_value_text) TextView mainOpenIssuesValueText;
-    @BindView(R.id.git_main_activity_toolbar) Toolbar mainToolbar;
 
     /** ACTIVITY LIFECYCLE METHODS _____________________________________________________________ **/
 
@@ -61,50 +50,37 @@ public class MainActivity extends AppCompatActivity {
 
         initLayout();
         initText();
-        initButtons();
     }
 
     /** LAYOUT METHODS _________________________________________________________________________ **/
 
     private void initLayout() {
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
-        setSupportActionBar(mainToolbar);
-    }
+        mainActivityBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        mainActivityViewModel = new MainViewModel();
+        mainActivityViewModel.setMainViewModelListener(this);
+        mainActivityBinding.setViewModel(mainActivityViewModel);
 
-    private void initButtons() {
-
-        // FLOATING ACTION BUTTON:
-        mainFabButton.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                mainProgressBar.setVisibility(View.VISIBLE);
-                retrieveIssues();
-            }
-        });
+        setSupportActionBar(mainActivityBinding.gitMainActivityToolbar);
     }
 
     private void initText() {
-        mainRepoName.setText(GitConstants.GIT_REPO);
-        mainRepoName.setShadowLayer(4, 2, 2, Color.BLACK);
-        mainRepoAuthor.setShadowLayer(4, 2, 2, Color.BLACK);
-        mainRepoAuthor.setText(GitConstants.GIT_USER);
+        mainActivityBinding.repoNameText.setShadowLayer(4, 2, 2, Color.BLACK);
+        mainActivityBinding.repoAuthorText.setShadowLayer(4, 2, 2, Color.BLACK);
     }
 
     private void displaySnackbar() {
-        Snackbar.make(mainLayout, String.format(getResources().getString(R.string.open_issues_snackbar_message), issuesListResult.size()), Snackbar.LENGTH_LONG).show();
+        Snackbar.make(mainActivityBinding.gitMainActivityLayout, String.format(getResources().getString(R.string.open_issues_snackbar_message), issuesListResult.size()), Snackbar.LENGTH_LONG).show();
     }
 
     private void updateView(boolean issuesReceived) {
 
-        mainProgressBar.setVisibility(View.GONE);
+        mainActivityViewModel.setMainProgressBarVisibility(false);
 
         if (issuesReceived) {
             initRecyclerView();
             setRecyclerList(issuesListResult);
-            mainOpenIssuesValueText.setText(" " + issuesListResult.size());
-            mainOpenIssuesContainer.setVisibility(View.VISIBLE);
+            mainActivityViewModel.setOpenIssuesValueText(" " + issuesListResult.size());
+            mainActivityViewModel.setOpenIssueContainerVisibility(true);
             displaySnackbar();
         }
     }
@@ -113,12 +89,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void initRecyclerView() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        mainRecyclerView.setLayoutManager(layoutManager);
+        mainActivityBinding.gitMainActivityRecyclerView.setLayoutManager(layoutManager);
     }
 
     private void setRecyclerList(List<Issue> issueList){
         IssuesAdapter recyclerAdapter = new IssuesAdapter(issueList, this);
-        mainRecyclerView.setAdapter(recyclerAdapter);
+        mainActivityBinding.gitMainActivityRecyclerView.setAdapter(recyclerAdapter);
     }
 
     /** RETROFIT METHODS _______________________________________________________________________ **/
@@ -159,5 +135,14 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    /** LISTENER METHODS _______________________________________________________________________ **/
+
+    @Override
+    public void onFabButtonClicked() {
+        mainActivityViewModel.setMainProgressBarVisibility(true);
+        mainActivityBinding.gitMainActivityProgressIndicator.setVisibility(View.VISIBLE);
+        retrieveIssues();
     }
 }

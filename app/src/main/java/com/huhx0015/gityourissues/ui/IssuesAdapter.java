@@ -2,24 +2,27 @@ package com.huhx0015.gityourissues.ui;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v7.widget.CardView;
+import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import com.huhx0015.gityourissues.R;
 import com.huhx0015.gityourissues.activities.CommentsActivity;
 import com.huhx0015.gityourissues.constants.ActivityConstants;
+import com.huhx0015.gityourissues.databinding.AdapterIssuesBinding;
 import com.huhx0015.gityourissues.models.Issue;
+import com.huhx0015.gityourissues.viewmodel.IssuesRowViewModel;
 import java.util.List;
 
 /**
  * Created by Michael Yoon Huh on 1/29/2016.
  */
 
-public class IssuesAdapter extends RecyclerView.Adapter<IssuesAdapter.ListViewHolder> {
+public class IssuesAdapter extends RecyclerView.Adapter<IssuesAdapter.IssuesViewHolder> {
+
+    /** CLASS VARIABLES ________________________________________________________________________ **/
 
     private static final String LOG_TAG = IssuesAdapter.class.getSimpleName();
 
@@ -36,35 +39,36 @@ public class IssuesAdapter extends RecyclerView.Adapter<IssuesAdapter.ListViewHo
     /** RECYCLER VIEW METHODS __________________________________________________________________ **/
 
     @Override
-    public ListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.issues_view_cardview_row, parent, false);
-
-        ListViewHolder viewHolder = new ListViewHolder(view, new ListViewHolder.OnItemViewHolderClick() {
-
-            @Override
-            public void onItemClick(View caller, int position) {
-                launchCommentsActivity(issueList.get(position));
-            }
-        });
-
-        return viewHolder;
+    public IssuesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_issues, parent, false);
+        return new IssuesViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(ListViewHolder holder, int position) {
+    public void onBindViewHolder(final IssuesViewHolder holder, int position) {
 
-        String issueTitle = "#" + issueList.get(position).getNumber() + ": " + issueList.get(position).getTitle();
-        String issueDate = issueList.get(position).getUpdatedAt();
-        String issueBody = issueList.get(position).getBody();
+        String issueTitle = "#" + issueList.get(holder.getAdapterPosition()).getNumber() + ": " + issueList.get(position).getTitle();
+        String issueDate = issueList.get(holder.getAdapterPosition()).getUpdatedAt();
+        String issueBody = issueList.get(holder.getAdapterPosition()).getBody();
 
         if (issueBody.length() > 140) {
             issueBody = issueBody.substring(0, 140) + "...";
         }
 
-        holder.issueTitleText.setText(issueTitle);
-        holder.issueBodyText.setText(issueBody);
-        holder.issueDateText.setText(issueDate);
+        IssuesRowViewModel rowViewModel = holder.getIssuesViewModel();
+
+        rowViewModel.setIssueTitleText(issueTitle);
+        rowViewModel.setIssueDateText(issueDate);
+        rowViewModel.setIssueBodyText(issueBody);
+
+        rowViewModel.setIssuesRowViewModelListener(new IssuesRowViewModel.IssuesRowViewModelListener() {
+            @Override
+            public void onIssueRowClicked() {
+                launchCommentsActivity(issueList.get(holder.getAdapterPosition()));
+            }
+        });
+
+        rowViewModel.notifyChange();
 
         Log.d(LOG_TAG, "onBindViewHolder(): Issue Name: " + issueTitle);
         Log.d(LOG_TAG, "onBindViewHolder(): Issue Body: " + issueBody);
@@ -96,38 +100,24 @@ public class IssuesAdapter extends RecyclerView.Adapter<IssuesAdapter.ListViewHo
 
     /** SUBCLASSES _____________________________________________________________________________ **/
 
-    public static class ListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public static class IssuesViewHolder extends RecyclerView.ViewHolder {
 
-        CardView issueCardView;
-        TextView issueTitleText;
-        TextView issueBodyText;
-        TextView issueDateText;
+        private AdapterIssuesBinding issuesBinding;
+        private IssuesRowViewModel issuesViewModel;
 
-        public OnItemViewHolderClick resultItemListener;
-
-        ListViewHolder(View itemView, OnItemViewHolderClick listener) {
-
-            super(itemView);
-
-            issueCardView = (CardView) itemView.findViewById(R.id.issues_view_cardview_container);
-            issueTitleText = (TextView) itemView.findViewById(R.id.issue_name_text);
-            issueBodyText = (TextView) itemView.findViewById(R.id.issue_body_text);
-            issueDateText = (TextView) itemView.findViewById(R.id.issue_date_text);
-
-            if (listener != null) {
-                resultItemListener = listener;
-                itemView.setOnClickListener(this);
-            }
+        public IssuesViewHolder(View rowView) {
+            super(rowView);
+            issuesBinding = DataBindingUtil.bind(rowView);
+            issuesViewModel = new IssuesRowViewModel();
+            issuesBinding.setViewModel(issuesViewModel);
         }
 
-        @Override
-        public void onClick(View v) {
-            int itemPos = getAdapterPosition();
-            resultItemListener.onItemClick(v, itemPos);
+        public AdapterIssuesBinding getIssuesBinding() {
+            return this.issuesBinding;
         }
 
-        public interface OnItemViewHolderClick {
-            void onItemClick(View caller, int position);
+        public IssuesRowViewModel getIssuesViewModel() {
+            return this.issuesViewModel;
         }
     }
 }
