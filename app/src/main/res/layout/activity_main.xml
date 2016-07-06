@@ -109,14 +109,14 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@{viewModel.openIssuesValueText}"
+                                android:text="@string/open_issues"
                                 android:id="@+id/repo_open_issues_text"
                                 android:textColor="@android:color/white" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text=" 0"
+                                android:text="@{viewModel.openIssuesValueText}"
                                 android:id="@+id/repo_open_issues_value_text"
                                 android:textColor="@android:color/holo_red_dark" />
                         </LinearLayout>

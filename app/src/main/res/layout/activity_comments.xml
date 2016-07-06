@@ -61,7 +61,7 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/git_comments_activity_progress_indicator"
                     android:layout_gravity="center"
-                    android:visibility="gone" />
+                    android:visibility="@{viewModel.isProgressBarVisible ? View.VISIBLE : View.GONE}" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -70,7 +70,7 @@
                     android:id="@+id/git_comments_error_text"
                     android:layout_gravity="center"
                     android:textSize="18sp"
-                    android:visibility="gone" />
+                    android:visibility="@{viewModel.isErrorTextVisible ? View.VISIBLE : View.GONE}" />
             </FrameLayout>
         </LinearLayout>
 

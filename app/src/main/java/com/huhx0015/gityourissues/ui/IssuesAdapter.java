@@ -40,12 +40,17 @@ public class IssuesAdapter extends RecyclerView.Adapter<IssuesAdapter.IssuesView
 
     @Override
     public IssuesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_issues, parent, false);
-        return new IssuesViewHolder(view);
+        AdapterIssuesBinding binding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.adapter_issues, parent, false);
+        return new IssuesViewHolder(binding, new IssuesViewHolder.IssuesViewHolderListener() {
+            @Override
+            public void onIssueClick(View view, int position) {
+                launchCommentsActivity(issueList.get(position));
+            }
+        });
     }
 
     @Override
-    public void onBindViewHolder(final IssuesViewHolder holder, int position) {
+    public void onBindViewHolder(IssuesViewHolder holder, final int position) {
 
         String issueTitle = "#" + issueList.get(holder.getAdapterPosition()).getNumber() + ": " + issueList.get(position).getTitle();
         String issueDate = issueList.get(holder.getAdapterPosition()).getUpdatedAt();
@@ -55,22 +60,12 @@ public class IssuesAdapter extends RecyclerView.Adapter<IssuesAdapter.IssuesView
             issueBody = issueBody.substring(0, 140) + "...";
         }
 
-        IssuesRowViewModel rowViewModel = holder.getIssuesViewModel();
+        holder.bindView(); // Binds the ViewModel.
+        IssuesRowViewModel rowViewModel = holder.issuesBinding.getViewModel();
 
         rowViewModel.setIssueTitleText(issueTitle);
         rowViewModel.setIssueDateText(issueDate);
         rowViewModel.setIssueBodyText(issueBody);
-
-        rowViewModel.setIssuesRowViewModelListener(new IssuesRowViewModel.IssuesRowViewModelListener() {
-            @Override
-            public void onIssueRowClicked() {
-                launchCommentsActivity(issueList.get(holder.getAdapterPosition()));
-            }
-        });
-
-        holder.getIssuesBinding().setViewModel(rowViewModel);
-
-        //rowViewModel.notifyChange();
 
         Log.d(LOG_TAG, "onBindViewHolder(): Issue Name: " + issueTitle);
         Log.d(LOG_TAG, "onBindViewHolder(): Issue Body: " + issueBody);
@@ -102,24 +97,34 @@ public class IssuesAdapter extends RecyclerView.Adapter<IssuesAdapter.IssuesView
 
     /** SUBCLASSES _____________________________________________________________________________ **/
 
-    public static class IssuesViewHolder extends RecyclerView.ViewHolder {
+    public static class IssuesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private AdapterIssuesBinding issuesBinding;
-        private IssuesRowViewModel issuesViewModel;
+        private IssuesViewHolderListener issuesViewHolderListener;
 
-        public IssuesViewHolder(View rowView) {
-            super(rowView);
-            issuesBinding = DataBindingUtil.bind(rowView);
-            issuesViewModel = new IssuesRowViewModel();
-            issuesBinding.setViewModel(issuesViewModel);
+        public IssuesViewHolder(AdapterIssuesBinding binding, IssuesViewHolderListener listener) {
+            super(binding.issuesViewCardviewContainer);
+            this.issuesBinding = binding;
+            this.issuesViewHolderListener = listener;
+
+            binding.issuesViewCardviewContainer.setOnClickListener(this);
         }
 
-        public AdapterIssuesBinding getIssuesBinding() {
-            return this.issuesBinding;
+        private void bindView() {
+            IssuesRowViewModel issuesRowViewModel = new IssuesRowViewModel();
+            issuesBinding.setViewModel(issuesRowViewModel);
         }
 
-        public IssuesRowViewModel getIssuesViewModel() {
-            return this.issuesViewModel;
+        @Override
+        public void onClick(View view) {
+            int itemPos = getAdapterPosition();
+            issuesViewHolderListener.onIssueClick(view, itemPos);
+        }
+
+        /** INTERFACE __________________________________________________________________________ **/
+
+        public interface IssuesViewHolderListener {
+            void onIssueClick(View view, int position);
         }
     }
 }
