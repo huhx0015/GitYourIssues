@@ -1,16 +1,15 @@
 package com.huhx0015.gityourissues.ui;
 
 import android.content.Context;
-import android.support.v7.widget.CardView;
+import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 import com.huhx0015.gityourissues.R;
+import com.huhx0015.gityourissues.databinding.AdapterCommentsBinding;
 import com.huhx0015.gityourissues.models.Comment;
+import com.huhx0015.gityourissues.viewmodel.CommentsRowViewModel;
 import com.squareup.picasso.Picasso;
 import java.util.List;
 
@@ -18,12 +17,18 @@ import java.util.List;
  * Created by Michael Yoon Huh on 1/29/2016.
  */
 
-public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ListViewHolder> {
+public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.CommentsViewHolder> {
 
-    private static final String LOG_TAG = CommentsAdapter.class.getSimpleName();
+    /** CLASS VARIABLES ________________________________________________________________________ **/
 
+    // ADAPTER VARIABLES
     private Context context;
+
+    // LIST VARIABLES
     private List<Comment> commentList;
+
+    // LOGGING VARIABLES
+    private static final String LOG_TAG = CommentsAdapter.class.getSimpleName();
 
     /** CONSTRUCTOR METHODS ____________________________________________________________________ **/
 
@@ -35,17 +40,23 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ListVi
     /** RECYCLER VIEW METHODS __________________________________________________________________ **/
 
     @Override
-    public ListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.comments_view_cardview_row, parent, false);
-        return new ListViewHolder(view);
+    public CommentsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        AdapterCommentsBinding binding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.adapter_comments, parent, false);
+        return new CommentsViewHolder(binding);
     }
 
     @Override
-    public void onBindViewHolder(ListViewHolder holder, int position) {
+    public void onBindViewHolder(CommentsViewHolder holder, int position) {
+        String commentsName = commentList.get(position).getUser().getLogin();
+        String commentsText = commentList.get(position).getBody();
+        String commentsTimeText = commentList.get(position).getUpdatedAt();
 
-        holder.commentsNameText.setText(commentList.get(position).getUser().getLogin());
-        holder.commentText.setText(commentList.get(position).getBody());
-        holder.commentsTimeText.setText(commentList.get(position).getUpdatedAt());
+        holder.bindView(); // Binds the ViewModel.
+        CommentsRowViewModel rowViewModel = holder.commentsBinding.getViewModel();
+
+        rowViewModel.setCommentsNameText(commentsName);
+        rowViewModel.setCommentsText(commentsText);
+        rowViewModel.setCommentsTimeText(commentsTimeText);
 
         Log.d(LOG_TAG, "onBindViewHolder(): Comment Name: " + commentList.get(position).getUser().getLogin());
         Log.d(LOG_TAG, "onBindViewHolder(): Comment Body: " + commentList.get(position).getBody());
@@ -62,11 +73,11 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ListVi
         if (avatarImageUrl != null) {
             Picasso.with(context)
                     .load(avatarImageUrl)
-                    .into(holder.commentsAvatarImage);
+                    .into(holder.commentsBinding.commentsAvatarImage);
         } else {
             Picasso.with(context)
                     .load(R.mipmap.ic_launcher)
-                    .into(holder.commentsAvatarImage);
+                    .into(holder.commentsBinding.commentsAvatarImage);
         }
     }
 
@@ -82,23 +93,18 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ListVi
 
     /** SUBCLASSES _____________________________________________________________________________ **/
 
-    public static class ListViewHolder extends RecyclerView.ViewHolder {
+    public static class CommentsViewHolder extends RecyclerView.ViewHolder {
 
-        CardView commentsCardView;
-        ImageView commentsAvatarImage;
-        TextView commentsNameText;
-        TextView commentText;
-        TextView commentsTimeText;
+        private AdapterCommentsBinding commentsBinding;
 
-        ListViewHolder(View itemView) {
+        public CommentsViewHolder(AdapterCommentsBinding binding) {
+            super(binding.commentsViewCardviewContainer);
+            this.commentsBinding = binding;
+        }
 
-            super(itemView);
-
-            commentsCardView = (CardView) itemView.findViewById(R.id.comments_view_cardview_container);
-            commentsAvatarImage = (ImageView) itemView.findViewById(R.id.comments_avatar_image);
-            commentsNameText = (TextView) itemView.findViewById(R.id.comments_name_text);
-            commentText = (TextView) itemView.findViewById(R.id.comments_text);
-            commentsTimeText = (TextView) itemView.findViewById(R.id.comments_time_text);
+        private void bindView() {
+            CommentsRowViewModel issuesRowViewModel = new CommentsRowViewModel();
+            commentsBinding.setViewModel(issuesRowViewModel);
         }
     }
 }

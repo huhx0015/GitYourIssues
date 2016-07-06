@@ -24,10 +24,14 @@ public class IssuesAdapter extends RecyclerView.Adapter<IssuesAdapter.IssuesView
 
     /** CLASS VARIABLES ________________________________________________________________________ **/
 
-    private static final String LOG_TAG = IssuesAdapter.class.getSimpleName();
-
+    // ADAPTER VARIABLES
     private Context context;
+
+    // LIST VARIABLES
     private List<Issue> issueList;
+
+    // LOGGING VARIABLES
+    private static final String LOG_TAG = IssuesAdapter.class.getSimpleName();
 
     /** CONSTRUCTOR METHODS ____________________________________________________________________ **/
 
@@ -51,7 +55,6 @@ public class IssuesAdapter extends RecyclerView.Adapter<IssuesAdapter.IssuesView
 
     @Override
     public void onBindViewHolder(IssuesViewHolder holder, final int position) {
-
         String issueTitle = "#" + issueList.get(holder.getAdapterPosition()).getNumber() + ": " + issueList.get(position).getTitle();
         String issueDate = issueList.get(holder.getAdapterPosition()).getUpdatedAt();
         String issueBody = issueList.get(holder.getAdapterPosition()).getBody();
