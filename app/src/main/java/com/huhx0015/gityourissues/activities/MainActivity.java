@@ -7,7 +7,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
-import android.view.View;
 import com.huhx0015.gityourissues.R;
 import com.huhx0015.gityourissues.constants.GitConstants;
 import com.huhx0015.gityourissues.databinding.ActivityMainBinding;
@@ -34,13 +33,15 @@ public class MainActivity extends AppCompatActivity implements MainViewModel.Mai
 
     /** CLASS VARIABLES ________________________________________________________________________ **/
 
-    private static final String LOG_TAG = MainActivity.class.getSimpleName();
-
+    // BINDING / VIEWMODEL VARIABLES
     private ActivityMainBinding mainActivityBinding;
     private MainViewModel mainActivityViewModel;
 
+    // LIST VARIABLES
     private List<Issue> issuesListResult;
-    private String currentState = GitConstants.GIT_STATE_OPEN;
+
+    // LOGGING VARIABLES
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     /** ACTIVITY LIFECYCLE METHODS _____________________________________________________________ **/
 
@@ -48,18 +49,21 @@ public class MainActivity extends AppCompatActivity implements MainViewModel.Mai
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        initLayout();
+        initBinding();
+        initToolbar();
         initText();
     }
 
     /** LAYOUT METHODS _________________________________________________________________________ **/
 
-    private void initLayout() {
+    private void initBinding() {
         mainActivityBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         mainActivityViewModel = new MainViewModel();
         mainActivityViewModel.setMainViewModelListener(this);
         mainActivityBinding.setViewModel(mainActivityViewModel);
+    }
 
+    private void initToolbar() {
         setSupportActionBar(mainActivityBinding.gitMainActivityToolbar);
     }
 
@@ -111,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements MainViewModel.Mai
 
         RetrofitInterface apiRequest = retrofitAdapter.create(RetrofitInterface.class);
         Observable<List<Issue>> call = apiRequest.getIssues(GitConstants.GIT_USER, GitConstants.GIT_REPO,
-                GitConstants.GIT_SORT_UPDATED, currentState, GitConstants.GIT_PAGE_ISSUE_LIMIT);
+                GitConstants.GIT_SORT_UPDATED, GitConstants.GIT_STATE_OPEN, GitConstants.GIT_PAGE_ISSUE_LIMIT);
 
         Subscription subscription = call.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -142,7 +146,6 @@ public class MainActivity extends AppCompatActivity implements MainViewModel.Mai
     @Override
     public void onFabButtonClicked() {
         mainActivityViewModel.setMainProgressBarVisibility(true);
-        mainActivityBinding.gitMainActivityProgressIndicator.setVisibility(View.VISIBLE);
         retrieveIssues();
     }
 }

@@ -8,23 +8,17 @@ import android.view.View;
  */
 public class IssuesRowViewModel extends BaseObservable {
 
-    /** CLASS VARIABLES _____________________________________________________ **/
+    /** CLASS VARIABLES ________________________________________________________________________ **/
 
+    // LISTENER VARIABLES
+    private IssuesRowViewModelListener issuesRowViewModelListener;
+
+    // TEXT VARIABLES
     private String issueTitleText;
     private String issueBodyText;
     private String issueDateText;
 
-    private IssuesRowViewModelListener issuesRowViewModelListener;
-
-    public interface IssuesRowViewModelListener {
-        void onIssueRowClicked();
-    }
-
-    public void onClickIssueRow(View view) {
-        if (issuesRowViewModelListener != null) {
-            issuesRowViewModelListener.onIssueRowClicked();
-        }
-    }
+    /** VIEW MODEL METHODS _____________________________________________________________________ **/
 
     public String getIssueTitleText() {
         return issueTitleText;
@@ -54,5 +48,19 @@ public class IssuesRowViewModel extends BaseObservable {
         if (issuesRowViewModelListener != null) {
             this.issuesRowViewModelListener = listener;
         }
+    }
+
+    /** CLICK METHODS __________________________________________________________________________ **/
+
+    public void onClickIssueRow(View view) {
+        if (issuesRowViewModelListener != null) {
+            issuesRowViewModelListener.onIssueRowClicked();
+        }
+    }
+
+    /** INTERFACE ______________________________________________________________________________ **/
+
+    public interface IssuesRowViewModelListener {
+        void onIssueRowClicked();
     }
 }

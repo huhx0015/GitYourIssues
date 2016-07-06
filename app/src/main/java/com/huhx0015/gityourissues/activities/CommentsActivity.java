@@ -1,25 +1,21 @@
 package com.huhx0015.gityourissues.activities;
 
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import com.huhx0015.gityourissues.R;
 import com.huhx0015.gityourissues.constants.ActivityConstants;
 import com.huhx0015.gityourissues.constants.GitConstants;
+import com.huhx0015.gityourissues.databinding.ActivityCommentsBinding;
 import com.huhx0015.gityourissues.interfaces.RetrofitInterface;
 import com.huhx0015.gityourissues.models.Comment;
 import com.huhx0015.gityourissues.ui.CommentsAdapter;
+import com.huhx0015.gityourissues.viewmodel.CommentsActivityViewModel;
 import java.util.ArrayList;
 import java.util.List;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -34,32 +30,28 @@ import rx.schedulers.Schedulers;
  */
 public class CommentsActivity extends AppCompatActivity {
 
-    private static final String LOG_TAG = CommentsActivity.class.getSimpleName();
+    /** CLASS VARIABLES ________________________________________________________________________ **/
 
+    // BINDING / VIEWMODEL VARIABLES
+    private ActivityCommentsBinding commentsActivityBinding;
+    private CommentsActivityViewModel commentsActivityViewModel;
+
+    // LIST VARIABLES
     private List<Comment> commentsListResult;
     private int currentIssue = 0;
 
-    @BindView(R.id.git_comments_activity_progress_indicator) ProgressBar commentsProgressBar;
-    @BindView(R.id.git_comments_activity_recycler_view) RecyclerView commentsRecyclerView;
-    @BindView(R.id.git_comments_error_text) TextView commentsErrorText;
-    @BindView(R.id.git_comments_activity_toolbar) Toolbar commentsToolbar;
+    // LOGGING VARIABLES
+    private static final String LOG_TAG = CommentsActivity.class.getSimpleName();
+
+    /** ACTIVITY LIFECYCLE METHODS _____________________________________________________________ **/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        initLayout();
-
-        if (getIntent().getExtras() != null) {
-            currentIssue = getIntent().getIntExtra(ActivityConstants.GIT_ISSUE_CONTENT, 0);
-        }
-
-        if (currentIssue != 0) {
-            commentsProgressBar.setVisibility(View.VISIBLE);
-            retrieveComments();
-        } else {
-            commentsErrorText.setVisibility(View.VISIBLE);
-        }
+        initBinding();
+        initToolbar();
+        initExtras();
     }
 
     /** ACTIVITY OVERRIDE METHODS ______________________________________________________________ **/
@@ -77,19 +69,35 @@ public class CommentsActivity extends AppCompatActivity {
 
     /** LAYOUT METHODS _________________________________________________________________________ **/
 
-    private void initLayout() {
-        setContentView(R.layout.activity_comments);
-        ButterKnife.bind(this);
+    private void initBinding() {
+        commentsActivityBinding = DataBindingUtil.setContentView(this, R.layout.activity_comments);
+        commentsActivityViewModel = new CommentsActivityViewModel();
+        commentsActivityBinding.setViewModel(commentsActivityViewModel);
+    }
 
-        commentsToolbar.setTitle(getResources().getString(R.string.comments_title));
-        setSupportActionBar(commentsToolbar);
+    private void initToolbar() {
+        commentsActivityBinding.gitCommentsActivityToolbar.setTitle(getResources().getString(R.string.comments_title));
+        setSupportActionBar(commentsActivityBinding.gitCommentsActivityToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
     }
 
+    private void initExtras() {
+        if (getIntent().getExtras() != null) {
+            currentIssue = getIntent().getIntExtra(ActivityConstants.GIT_ISSUE_CONTENT, 0);
+        }
+
+        if (currentIssue != 0) {
+            commentsActivityViewModel.setProgressBarVisible(true);
+            retrieveComments();
+        } else {
+            commentsActivityViewModel.setErrorTextVisible(true);
+        }
+    }
+
     private void updateView(boolean issuesReceived) {
 
-        commentsProgressBar.setVisibility(View.GONE);
+        commentsActivityViewModel.setProgressBarVisible(false);
 
         if (issuesReceived) {
             initRecyclerView();
@@ -101,12 +109,12 @@ public class CommentsActivity extends AppCompatActivity {
 
     private void initRecyclerView() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        commentsRecyclerView.setLayoutManager(layoutManager);
+        commentsActivityBinding.gitCommentsActivityRecyclerView.setLayoutManager(layoutManager);
     }
 
     private void setRecyclerList(List<Comment> commentList){
         CommentsAdapter recyclerAdapter = new CommentsAdapter(commentList, this);
-        commentsRecyclerView.setAdapter(recyclerAdapter);
+        commentsActivityBinding.gitCommentsActivityRecyclerView.setAdapter(recyclerAdapter);
     }
 
     /** RETROFIT METHODS _______________________________________________________________________ **/

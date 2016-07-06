@@ -68,7 +68,9 @@ public class IssuesAdapter extends RecyclerView.Adapter<IssuesAdapter.IssuesView
             }
         });
 
-        rowViewModel.notifyChange();
+        holder.getIssuesBinding().setViewModel(rowViewModel);
+
+        //rowViewModel.notifyChange();
 
         Log.d(LOG_TAG, "onBindViewHolder(): Issue Name: " + issueTitle);
         Log.d(LOG_TAG, "onBindViewHolder(): Issue Body: " + issueBody);

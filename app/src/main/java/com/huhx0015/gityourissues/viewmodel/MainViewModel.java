@@ -8,22 +8,19 @@ import android.view.View;
  */
 public class MainViewModel extends BaseObservable {
 
-    /** CLASS VARIABLES _____________________________________________________ **/
+    /** CLASS VARIABLES ________________________________________________________________________ **/
 
-    private boolean mainProgressBarVisible = false;
-    private boolean openIssueContainerVisible = false;
+    // LISTENER VARIABLES
     private MainViewModelListener mainViewModelListener;
+
+    // TEXT VARIABLES
     private String openIssuesValueText;
 
-    public interface MainViewModelListener {
-        void onFabButtonClicked();
-    }
+    // VISIBILITY VARIABLES
+    private boolean mainProgressBarVisible = false;
+    private boolean openIssueContainerVisible = false;
 
-    public void onClickFabButton(View view) {
-        if (mainViewModelListener != null) {
-            mainViewModelListener.onFabButtonClicked();
-        }
-    }
+    /** VIEW MODEL METHODS _____________________________________________________________________ **/
 
     public String getOpenIssuesValueText() {
         return openIssuesValueText;
@@ -54,5 +51,19 @@ public class MainViewModel extends BaseObservable {
 
     public void setMainViewModelListener(MainViewModelListener listener) {
         this.mainViewModelListener = listener;
+    }
+
+    /** CLICK METHODS __________________________________________________________________________ **/
+
+    public void onClickFabButton(View view) {
+        if (mainViewModelListener != null) {
+            mainViewModelListener.onFabButtonClicked();
+        }
+    }
+
+    /** INTERFACE ______________________________________________________________________________ **/
+
+    public interface MainViewModelListener {
+        void onFabButtonClicked();
     }
 }
