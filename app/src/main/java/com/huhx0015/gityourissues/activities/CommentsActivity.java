@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import com.huhx0015.gityourissues.R;
 import com.huhx0015.gityourissues.constants.ActivityConstants;
 import com.huhx0015.gityourissues.constants.GitConstants;
@@ -114,7 +115,12 @@ public class CommentsActivity extends AppCompatActivity {
 
     private void setRecyclerList(List<Comment> commentList){
         CommentsAdapter recyclerAdapter = new CommentsAdapter(commentList, this);
+        recyclerAdapter.setHasStableIds(true);
         commentsActivityBinding.gitCommentsActivityRecyclerView.setAdapter(recyclerAdapter);
+        commentsActivityBinding.gitCommentsActivityRecyclerView.setHasFixedSize(true);
+        commentsActivityBinding.gitCommentsActivityRecyclerView.setItemViewCacheSize(30);
+        commentsActivityBinding.gitCommentsActivityRecyclerView.setDrawingCacheEnabled(true);
+        commentsActivityBinding.gitCommentsActivityRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
     }
 
     /** RETROFIT METHODS _______________________________________________________________________ **/

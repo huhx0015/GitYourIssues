@@ -82,18 +82,28 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
     }
 
     @Override
-    public int getItemCount() {
-        return commentList.size();
+    public void onViewRecycled(CommentsViewHolder holder) {
+        super.onViewRecycled(holder);
+        holder.commentsBinding.commentsAvatarImage.setImageDrawable(null);
     }
 
     @Override
-    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
-        super.onAttachedToRecyclerView(recyclerView);
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public int getItemCount() {
+        if (commentList != null) {
+            return commentList.size();
+        } else {
+            return 0;
+        }
     }
 
     /** SUBCLASSES _____________________________________________________________________________ **/
 
-    public static class CommentsViewHolder extends RecyclerView.ViewHolder {
+    public class CommentsViewHolder extends RecyclerView.ViewHolder {
 
         private AdapterCommentsBinding commentsBinding;
 

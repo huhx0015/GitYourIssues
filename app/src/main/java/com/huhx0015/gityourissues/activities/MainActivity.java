@@ -7,6 +7,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
+import android.view.View;
+
 import com.huhx0015.gityourissues.R;
 import com.huhx0015.gityourissues.constants.GitConstants;
 import com.huhx0015.gityourissues.databinding.ActivityMainBinding;
@@ -98,7 +100,12 @@ public class MainActivity extends AppCompatActivity implements MainViewModel.Mai
 
     private void setRecyclerList(List<Issue> issueList){
         IssuesAdapter recyclerAdapter = new IssuesAdapter(issueList, this);
+        recyclerAdapter.setHasStableIds(true);
         mainActivityBinding.gitMainActivityRecyclerView.setAdapter(recyclerAdapter);
+        mainActivityBinding.gitMainActivityRecyclerView.setHasFixedSize(true);
+        mainActivityBinding.gitMainActivityRecyclerView.setItemViewCacheSize(30);
+        mainActivityBinding.gitMainActivityRecyclerView.setDrawingCacheEnabled(true);
+        mainActivityBinding.gitMainActivityRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
     }
 
     /** RETROFIT METHODS _______________________________________________________________________ **/

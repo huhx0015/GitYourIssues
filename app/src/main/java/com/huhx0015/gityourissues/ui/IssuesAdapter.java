@@ -12,6 +12,7 @@ import com.huhx0015.gityourissues.R;
 import com.huhx0015.gityourissues.activities.CommentsActivity;
 import com.huhx0015.gityourissues.constants.ActivityConstants;
 import com.huhx0015.gityourissues.databinding.AdapterIssuesBinding;
+import com.huhx0015.gityourissues.interfaces.IssuesViewHolderListener;
 import com.huhx0015.gityourissues.models.Issue;
 import com.huhx0015.gityourissues.viewmodel.IssuesRowViewModel;
 import java.util.List;
@@ -45,7 +46,7 @@ public class IssuesAdapter extends RecyclerView.Adapter<IssuesAdapter.IssuesView
     @Override
     public IssuesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         AdapterIssuesBinding binding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.adapter_issues, parent, false);
-        return new IssuesViewHolder(binding, new IssuesViewHolder.IssuesViewHolderListener() {
+        return new IssuesViewHolder(binding, new IssuesViewHolderListener() {
             @Override
             public void onIssueClick(View view, int position) {
                 launchCommentsActivity(issueList.get(position));
@@ -76,13 +77,17 @@ public class IssuesAdapter extends RecyclerView.Adapter<IssuesAdapter.IssuesView
     }
 
     @Override
-    public int getItemCount() {
-        return issueList.size();
+    public long getItemId(int position) {
+        return position;
     }
 
     @Override
-    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
-        super.onAttachedToRecyclerView(recyclerView);
+    public int getItemCount() {
+        if (issueList != null) {
+            return issueList.size();
+        } else {
+            return 0;
+        }
     }
 
     /** INTENT METHODS _________________________________________________________________________ **/
@@ -100,7 +105,7 @@ public class IssuesAdapter extends RecyclerView.Adapter<IssuesAdapter.IssuesView
 
     /** SUBCLASSES _____________________________________________________________________________ **/
 
-    public static class IssuesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class IssuesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private AdapterIssuesBinding issuesBinding;
         private IssuesViewHolderListener issuesViewHolderListener;
@@ -122,12 +127,6 @@ public class IssuesAdapter extends RecyclerView.Adapter<IssuesAdapter.IssuesView
         public void onClick(View view) {
             int itemPos = getAdapterPosition();
             issuesViewHolderListener.onIssueClick(view, itemPos);
-        }
-
-        /** INTERFACE __________________________________________________________________________ **/
-
-        public interface IssuesViewHolderListener {
-            void onIssueClick(View view, int position);
         }
     }
 }
