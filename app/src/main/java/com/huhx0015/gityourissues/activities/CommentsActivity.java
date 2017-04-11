@@ -37,6 +37,9 @@ public class CommentsActivity extends AppCompatActivity {
     private ActivityCommentsBinding commentsActivityBinding;
     private CommentsActivityViewModel commentsActivityViewModel;
 
+    // CONSTANTS VARIABLES
+    private static final int NUMBER_OF_PREFETCH_ITEMS = 3;
+
     // LIST VARIABLES
     private List<Comment> commentsListResult;
     private int currentIssue = 0;
@@ -110,6 +113,8 @@ public class CommentsActivity extends AppCompatActivity {
 
     private void initRecyclerView() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setItemPrefetchEnabled(true);
+        layoutManager.setInitialPrefetchItemCount(NUMBER_OF_PREFETCH_ITEMS);
         commentsActivityBinding.gitCommentsActivityRecyclerView.setLayoutManager(layoutManager);
     }
 
@@ -118,7 +123,6 @@ public class CommentsActivity extends AppCompatActivity {
         recyclerAdapter.setHasStableIds(true);
         commentsActivityBinding.gitCommentsActivityRecyclerView.setAdapter(recyclerAdapter);
         commentsActivityBinding.gitCommentsActivityRecyclerView.setHasFixedSize(true);
-        commentsActivityBinding.gitCommentsActivityRecyclerView.setItemViewCacheSize(30);
         commentsActivityBinding.gitCommentsActivityRecyclerView.setDrawingCacheEnabled(true);
         commentsActivityBinding.gitCommentsActivityRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
     }

@@ -77,6 +77,14 @@ public class IssuesAdapter extends RecyclerView.Adapter<IssuesAdapter.IssuesView
     }
 
     @Override
+    public void onViewRecycled(IssuesViewHolder holder) {
+        holder.issuesBinding.getViewModel().removeOnPropertyChangedCallback(null);
+        holder.issuesBinding.setViewModel(null);
+        holder.issuesBinding.executePendingBindings();
+        super.onViewRecycled(holder);
+    }
+
+    @Override
     public long getItemId(int position) {
         return position;
     }
@@ -105,12 +113,12 @@ public class IssuesAdapter extends RecyclerView.Adapter<IssuesAdapter.IssuesView
 
     /** SUBCLASSES _____________________________________________________________________________ **/
 
-    public class IssuesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class IssuesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private AdapterIssuesBinding issuesBinding;
         private IssuesViewHolderListener issuesViewHolderListener;
 
-        public IssuesViewHolder(AdapterIssuesBinding binding, IssuesViewHolderListener listener) {
+        IssuesViewHolder(AdapterIssuesBinding binding, IssuesViewHolderListener listener) {
             super(binding.issuesViewCardviewContainer);
             this.issuesBinding = binding;
             this.issuesViewHolderListener = listener;

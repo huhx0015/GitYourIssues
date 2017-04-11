@@ -39,6 +39,9 @@ public class MainActivity extends AppCompatActivity implements MainViewModel.Mai
     private ActivityMainBinding mainActivityBinding;
     private MainViewModel mainActivityViewModel;
 
+    // CONSTANTS VARIABLES
+    private static final int NUMBER_OF_PREFETCH_ITEMS = 4;
+
     // LIST VARIABLES
     private List<Issue> issuesListResult;
 
@@ -95,6 +98,8 @@ public class MainActivity extends AppCompatActivity implements MainViewModel.Mai
 
     private void initRecyclerView() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setItemPrefetchEnabled(true);
+        layoutManager.setInitialPrefetchItemCount(NUMBER_OF_PREFETCH_ITEMS);
         mainActivityBinding.gitMainActivityRecyclerView.setLayoutManager(layoutManager);
     }
 
@@ -103,7 +108,6 @@ public class MainActivity extends AppCompatActivity implements MainViewModel.Mai
         recyclerAdapter.setHasStableIds(true);
         mainActivityBinding.gitMainActivityRecyclerView.setAdapter(recyclerAdapter);
         mainActivityBinding.gitMainActivityRecyclerView.setHasFixedSize(true);
-        mainActivityBinding.gitMainActivityRecyclerView.setItemViewCacheSize(30);
         mainActivityBinding.gitMainActivityRecyclerView.setDrawingCacheEnabled(true);
         mainActivityBinding.gitMainActivityRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
     }

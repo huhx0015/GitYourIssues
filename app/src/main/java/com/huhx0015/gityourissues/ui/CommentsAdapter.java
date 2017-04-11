@@ -85,6 +85,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
     public void onViewRecycled(CommentsViewHolder holder) {
         super.onViewRecycled(holder);
         holder.commentsBinding.commentsAvatarImage.setImageDrawable(null);
+        holder.commentsBinding.getViewModel().removeOnPropertyChangedCallback(null);
+        holder.commentsBinding.setViewModel(null);
+        holder.commentsBinding.executePendingBindings();
     }
 
     @Override
@@ -103,11 +106,11 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Commen
 
     /** SUBCLASSES _____________________________________________________________________________ **/
 
-    public class CommentsViewHolder extends RecyclerView.ViewHolder {
+    class CommentsViewHolder extends RecyclerView.ViewHolder {
 
         private AdapterCommentsBinding commentsBinding;
 
-        public CommentsViewHolder(AdapterCommentsBinding binding) {
+        CommentsViewHolder(AdapterCommentsBinding binding) {
             super(binding.commentsViewCardviewContainer);
             this.commentsBinding = binding;
         }
